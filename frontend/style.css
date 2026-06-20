@@ -1,0 +1,448 @@
+/* =========================================================
+   CAD Viewer — Mobile-first dark theme
+   ========================================================= */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-primary:   #0f1117;
+  --bg-secondary: #1a1d27;
+  --bg-card:      #222536;
+  --bg-hover:     #2a2e44;
+  --accent:       #4f8ef7;
+  --accent-hover: #3a7aed;
+  --danger:       #e05252;
+  --danger-hover: #c43f3f;
+  --success:      #4caf7a;
+  --text-primary: #e8eaf0;
+  --text-secondary: #9095a8;
+  --border:       #2e3248;
+  --radius:       10px;
+  --radius-sm:    6px;
+  --shadow:       0 4px 20px rgba(0, 0, 0, 0.4);
+  --transition:   0.2s ease;
+}
+
+html, body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---- Top bar ---- */
+#topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+#topbar .logo {
+  width: 32px;
+  height: 32px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+#topbar h1 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  flex: 1;
+}
+
+#topbar .subtitle {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* ---- Layout ---- */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 61px);
+  overflow: hidden;
+}
+
+/* On wider screens: sidebar + viewer side by side */
+@media (min-width: 768px) {
+  #app {
+    flex-direction: row;
+  }
+}
+
+/* ---- Sidebar ---- */
+#sidebar {
+  width: 100%;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: 45vh;
+}
+
+@media (min-width: 768px) {
+  #sidebar {
+    width: 320px;
+    max-height: none;
+    border-bottom: none;
+    border-right: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+}
+
+/* ---- Upload zone ---- */
+#upload-section {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+#upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 20px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+  position: relative;
+}
+
+#upload-zone.drag-over {
+  border-color: var(--accent);
+  background: rgba(79, 142, 247, 0.08);
+}
+
+#upload-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+#upload-zone .upload-icon {
+  font-size: 2rem;
+  margin-bottom: 8px;
+  display: block;
+}
+
+#upload-zone .upload-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+#upload-zone .upload-hint {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+#upload-btn {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+#upload-btn:hover,
+#upload-btn:focus-visible {
+  background: var(--accent-hover);
+}
+
+#upload-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---- File list ---- */
+#file-list-section {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+
+#file-list-section h2 {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 12px 16px 8px;
+  position: sticky;
+  top: 0;
+  background: var(--bg-secondary);
+  z-index: 1;
+}
+
+#file-list {
+  list-style: none;
+}
+
+#file-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+#file-list li:hover {
+  background: var(--bg-hover);
+}
+
+#file-list li.active {
+  background: rgba(79, 142, 247, 0.12);
+  border-left: 3px solid var(--accent);
+  padding-left: 13px;
+}
+
+.file-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+  background: var(--bg-card);
+}
+
+.file-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-meta {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.file-delete {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  line-height: 1;
+  transition: color var(--transition), background var(--transition);
+  flex-shrink: 0;
+}
+
+.file-delete:hover {
+  color: var(--danger);
+  background: rgba(224, 82, 82, 0.1);
+}
+
+#empty-state {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+/* ---- 3D Viewer ---- */
+#viewer-panel {
+  flex: 1;
+  position: relative;
+  background: var(--bg-primary);
+  overflow: hidden;
+  min-height: 250px;
+}
+
+#viewer-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---- Viewer overlay messages ---- */
+#viewer-placeholder,
+#viewer-loading,
+#viewer-error {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  pointer-events: none;
+  text-align: center;
+  padding: 24px;
+}
+
+#viewer-placeholder .ph-icon {
+  font-size: 4rem;
+  opacity: 0.2;
+}
+
+#viewer-placeholder p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  max-width: 240px;
+  opacity: 0.6;
+}
+
+/* Spinner */
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+#viewer-loading p {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+#viewer-error .err-icon {
+  font-size: 2.5rem;
+}
+
+#viewer-error p {
+  color: var(--danger);
+  font-size: 0.875rem;
+  max-width: 300px;
+}
+
+/* ---- Viewer controls hint ---- */
+#viewer-hint {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.55);
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+  line-height: 1.6;
+  display: none;
+}
+
+#viewer-hint.visible {
+  display: block;
+}
+
+/* ---- Toast notifications ---- */
+#toast-container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 10px 18px;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  box-shadow: var(--shadow);
+  animation: toast-in 0.25s ease;
+  white-space: nowrap;
+  max-width: 90vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.toast.error {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.toast.success {
+  border-color: var(--success);
+  color: var(--success);
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Upload progress ---- */
+#upload-progress {
+  height: 3px;
+  background: var(--bg-card);
+  border-radius: 2px;
+  margin-top: 8px;
+  overflow: hidden;
+  display: none;
+}
+
+#upload-progress.visible {
+  display: block;
+}
+
+#upload-progress-bar {
+  height: 100%;
+  background: var(--accent);
+  width: 0%;
+  transition: width 0.2s ease;
+  border-radius: 2px;
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
