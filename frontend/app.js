@@ -49,7 +49,21 @@ let activeFileId = null;
 // Three.js scene
 // ---------------------------------------------------------------------------
 
-let renderer, scene, camera, controls, currentMesh, animFrameId;
+let renderer, scene, camera, controls, transformControls, currentMesh, animFrameId;
+let editMode = 'orbit'; // 'orbit' | 'translate' | 'rotate' | 'scale'
+
+// DOM refs for edit UI
+const editToolbar     = document.getElementById('edit-toolbar');
+const transformPanel  = document.getElementById('transform-panel');
+const btnOrbit        = document.getElementById('btn-orbit');
+const btnTranslate    = document.getElementById('btn-translate');
+const btnRotate       = document.getElementById('btn-rotate');
+const btnScale        = document.getElementById('btn-scale');
+const btnReset        = document.getElementById('btn-reset');
+const btnExport       = document.getElementById('btn-export');
+const tpPx = document.getElementById('tp-px'), tpPy = document.getElementById('tp-py'), tpPz = document.getElementById('tp-pz');
+const tpRx = document.getElementById('tp-rx'), tpRy = document.getElementById('tp-ry'), tpRz = document.getElementById('tp-rz');
+const tpSx = document.getElementById('tp-sx'), tpSy = document.getElementById('tp-sy'), tpSz = document.getElementById('tp-sz');
 
 function initThree() {
   renderer = new THREE.WebGLRenderer({
@@ -64,7 +78,6 @@ function initThree() {
 
   scene = new THREE.Scene();
 
-  // Camera
   camera = new THREE.PerspectiveCamera(
     45,
     viewerPanel.clientWidth / viewerPanel.clientHeight,
@@ -73,36 +86,138 @@ function initThree() {
   );
   camera.position.set(0, 0, 5);
 
-  // Lights
   const ambient = new THREE.AmbientLight(0xffffff, 0.45);
   scene.add(ambient);
-
   const key = new THREE.DirectionalLight(0xffffff, 0.85);
   key.position.set(5, 10, 7);
   key.castShadow = true;
   scene.add(key);
-
   const fill = new THREE.DirectionalLight(0x8899ff, 0.3);
   fill.position.set(-6, -4, -5);
   scene.add(fill);
 
-  // OrbitControls — touch support enabled by default
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
   controls.screenSpacePanning = true;
   controls.minDistance = 0.1;
   controls.maxDistance = 5000;
-  controls.touches = {
-    ONE: THREE.TOUCH.ROTATE,
-    TWO: THREE.TOUCH.DOLLY_PAN,
-  };
+  controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
 
-  // Resize observer
+  // TransformControls
+  transformControls = new THREE.TransformControls(camera, renderer.domElement);
+  transformControls.addEventListener('dragging-changed', (e) => {
+    controls.enabled = !e.value;
+  });
+  transformControls.addEventListener('change', syncTransformPanel);
+  scene.add(transformControls);
+
+  // Keyboard shortcuts
+  window.addEventListener('keydown', (e) => {
+    if (!currentMesh) return;
+    if (e.target.tagName === 'INPUT') return;
+    if (e.key === 'g' || e.key === 'G') setEditMode('translate');
+    if (e.key === 'r' || e.key === 'R') setEditMode('rotate');
+    if (e.key === 's' || e.key === 'S') setEditMode('scale');
+    if (e.key === 'o' || e.key === 'O' || e.key === 'Escape') setEditMode('orbit');
+  });
+
+  // Toolbar buttons
+  btnOrbit    .addEventListener('click', () => setEditMode('orbit'));
+  btnTranslate.addEventListener('click', () => setEditMode('translate'));
+  btnRotate   .addEventListener('click', () => setEditMode('rotate'));
+  btnScale    .addEventListener('click', () => setEditMode('scale'));
+  btnReset    .addEventListener('click', resetTransform);
+  btnExport   .addEventListener('click', exportStl);
+
+  // Numeric inputs → apply to mesh
+  [tpPx,tpPy,tpPz].forEach((inp, i) => inp.addEventListener('change', () => applyPanelToMesh()));
+  [tpRx,tpRy,tpRz].forEach((inp, i) => inp.addEventListener('change', () => applyPanelToMesh()));
+  [tpSx,tpSy,tpSz].forEach((inp, i) => inp.addEventListener('change', () => applyPanelToMesh()));
+
   const ro = new ResizeObserver(() => onResize());
   ro.observe(viewerPanel);
 
   renderLoop();
+}
+
+function setEditMode(mode) {
+  editMode = mode;
+  [btnOrbit, btnTranslate, btnRotate, btnScale].forEach(b => b.classList.remove('active'));
+  if (mode === 'orbit')     { btnOrbit.classList.add('active');     transformControls.detach(); controls.enabled = true; }
+  if (mode === 'translate') { btnTranslate.classList.add('active'); transformControls.setMode('translate'); if (currentMesh) transformControls.attach(currentMesh); }
+  if (mode === 'rotate')    { btnRotate.classList.add('active');    transformControls.setMode('rotate');    if (currentMesh) transformControls.attach(currentMesh); }
+  if (mode === 'scale')     { btnScale.classList.add('active');     transformControls.setMode('scale');     if (currentMesh) transformControls.attach(currentMesh); }
+}
+
+function syncTransformPanel() {
+  if (!currentMesh) return;
+  const p = currentMesh.position, r = currentMesh.rotation, s = currentMesh.scale;
+  const deg = THREE.MathUtils.radToDeg;
+  tpPx.value = p.x.toFixed(2); tpPy.value = p.y.toFixed(2); tpPz.value = p.z.toFixed(2);
+  tpRx.value = deg(r.x).toFixed(1); tpRy.value = deg(r.y).toFixed(1); tpRz.value = deg(r.z).toFixed(1);
+  tpSx.value = s.x.toFixed(3); tpSy.value = s.y.toFixed(3); tpSz.value = s.z.toFixed(3);
+}
+
+function applyPanelToMesh() {
+  if (!currentMesh) return;
+  const deg = THREE.MathUtils.degToRad;
+  currentMesh.position.set(+tpPx.value, +tpPy.value, +tpPz.value);
+  currentMesh.rotation.set(deg(+tpRx.value), deg(+tpRy.value), deg(+tpRz.value));
+  currentMesh.scale.set(+tpSx.value || 0.01, +tpSy.value || 0.01, +tpSz.value || 0.01);
+}
+
+function resetTransform() {
+  if (!currentMesh) return;
+  currentMesh.position.set(0, 0, 0);
+  currentMesh.rotation.set(0, 0, 0);
+  currentMesh.scale.set(1, 1, 1);
+  syncTransformPanel();
+  fitCameraToObject(currentMesh);
+  showToast('Transform zurückgesetzt.', 'info');
+}
+
+function exportStl() {
+  if (!currentMesh) return;
+  // Apply transform to geometry copy and export as binary STL
+  const geom = currentMesh.geometry.clone();
+  geom.applyMatrix4(currentMesh.matrixWorld);
+
+  const positions = geom.attributes.position;
+  const triCount = positions.count / 3;
+  const buf = new ArrayBuffer(84 + triCount * 50);
+  const view = new DataView(buf);
+  // Header (80 bytes)
+  const header = 'CAD Viewer Export';
+  for (let i = 0; i < 80; i++) view.setUint8(i, i < header.length ? header.charCodeAt(i) : 0);
+  view.setUint32(80, triCount, true);
+
+  let offset = 84;
+  for (let i = 0; i < triCount; i++) {
+    const ax = positions.getX(i*3),   ay = positions.getY(i*3),   az = positions.getZ(i*3);
+    const bx = positions.getX(i*3+1), by = positions.getY(i*3+1), bz = positions.getZ(i*3+1);
+    const cx = positions.getX(i*3+2), cy = positions.getY(i*3+2), cz = positions.getZ(i*3+2);
+    // Normal
+    const ux = bx-ax, uy = by-ay, uz = bz-az;
+    const vx = cx-ax, vy = cy-ay, vz = cz-az;
+    const nx = uy*vz - uz*vy, ny = uz*vx - ux*vz, nz = ux*vy - uy*vx;
+    const nl = Math.sqrt(nx*nx+ny*ny+nz*nz) || 1;
+    view.setFloat32(offset,    nx/nl, true); view.setFloat32(offset+4,  ny/nl, true); view.setFloat32(offset+8,  nz/nl, true);
+    view.setFloat32(offset+12, ax, true);    view.setFloat32(offset+16, ay, true);    view.setFloat32(offset+20, az, true);
+    view.setFloat32(offset+24, bx, true);    view.setFloat32(offset+28, by, true);    view.setFloat32(offset+32, bz, true);
+    view.setFloat32(offset+36, cx, true);    view.setFloat32(offset+40, cy, true);    view.setFloat32(offset+44, cz, true);
+    view.setUint16(offset+48, 0, true);
+    offset += 50;
+  }
+
+  const blob = new Blob([buf], { type: 'model/stl' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'modell_bearbeitet.stl';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('STL-Datei heruntergeladen.', 'success');
+  geom.dispose();
 }
 
 function renderLoop() {
@@ -152,6 +267,10 @@ function loadStlBuffer(buffer) {
   scene.add(currentMesh);
 
   fitCameraToObject(currentMesh);
+  syncTransformPanel();
+
+  // Re-attach transform controls if a mode is active
+  if (editMode !== 'orbit') transformControls.attach(currentMesh);
 }
 
 /**
@@ -186,6 +305,9 @@ function showPlaceholder() {
   viewerLoading.hidden = true;
   viewerError.hidden = true;
   viewerHint.classList.remove('visible');
+  editToolbar.hidden = true;
+  transformPanel.hidden = true;
+  transformControls.detach();
 }
 
 function showLoading(msg = 'Modell wird konvertiert …') {
@@ -209,6 +331,8 @@ function showModel() {
   viewerLoading.hidden = true;
   viewerError.hidden = true;
   viewerHint.classList.add('visible');
+  editToolbar.hidden = false;
+  transformPanel.hidden = false;
 }
 
 // ---------------------------------------------------------------------------

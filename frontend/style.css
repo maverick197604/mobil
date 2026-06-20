@@ -441,6 +441,119 @@ html, body {
   border-radius: 2px;
 }
 
+/* ---- Edit toolbar ---- */
+#edit-toolbar {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  background: rgba(15, 17, 23, 0.82);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px 8px;
+  backdrop-filter: blur(8px);
+  z-index: 10;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.tool-group {
+  display: flex;
+  gap: 4px;
+}
+
+.tool-group + .tool-group {
+  border-left: 1px solid var(--border);
+  padding-left: 6px;
+  margin-left: 2px;
+}
+
+.tool-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+  white-space: nowrap;
+}
+
+.tool-btn:hover { background: var(--bg-hover); }
+
+.tool-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.tool-btn.secondary { color: var(--text-secondary); }
+.tool-btn.secondary:hover { color: var(--text-primary); }
+
+/* ---- Transform panel ---- */
+#transform-panel {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  background: rgba(15, 17, 23, 0.82);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  backdrop-filter: blur(8px);
+  z-index: 10;
+  font-size: 0.75rem;
+  min-width: 260px;
+}
+
+.tp-header {
+  display: grid;
+  grid-template-columns: 20px 1fr 1fr 1fr;
+  gap: 4px;
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  text-align: center;
+  padding: 4px 0 0 0;
+  letter-spacing: 0.04em;
+}
+
+.tp-row {
+  display: grid;
+  grid-template-columns: 20px 1fr 1fr 1fr;
+  gap: 4px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.tp-label {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.tp-input {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  padding: 3px 5px;
+  border-radius: 4px;
+  width: 100%;
+  text-align: right;
+  -moz-appearance: textfield;
+}
+
+.tp-input::-webkit-outer-spin-button,
+.tp-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+.tp-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
 /* ---- Scrollbar ---- */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }

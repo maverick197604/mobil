@@ -85,6 +85,45 @@
         Drehen: Ziehen &nbsp;|&nbsp; Zoom: Scrollen / Pinch &nbsp;|&nbsp; Verschieben: Rechtsklick
       </div>
 
+      <!-- Edit toolbar (shown after model loads) -->
+      <div id="edit-toolbar" hidden aria-label="Bearbeitungswerkzeuge">
+        <div class="tool-group">
+          <button id="btn-orbit"     class="tool-btn active" title="Kamera bewegen (O)">🖱 Ansicht</button>
+          <button id="btn-translate" class="tool-btn"        title="Verschieben (G)">↔ Bewegen</button>
+          <button id="btn-rotate"    class="tool-btn"        title="Drehen (R)">↻ Drehen</button>
+          <button id="btn-scale"     class="tool-btn"        title="Skalieren (S)">⤢ Skalieren</button>
+        </div>
+        <div class="tool-group">
+          <button id="btn-reset"  class="tool-btn secondary" title="Zurücksetzen">⟳ Reset</button>
+          <button id="btn-export" class="tool-btn secondary" title="Als STL herunterladen">⬇ STL</button>
+        </div>
+      </div>
+
+      <!-- Transform panel -->
+      <div id="transform-panel" hidden aria-label="Transformationswerte">
+        <div class="tp-row">
+          <span class="tp-label">X</span>
+          <input class="tp-input" id="tp-px" type="number" step="0.1" value="0" aria-label="Position X">
+          <input class="tp-input" id="tp-rx" type="number" step="1"   value="0" aria-label="Rotation X (°)">
+          <input class="tp-input" id="tp-sx" type="number" step="0.1" value="1" min="0.01" aria-label="Skalierung X">
+        </div>
+        <div class="tp-row">
+          <span class="tp-label">Y</span>
+          <input class="tp-input" id="tp-py" type="number" step="0.1" value="0" aria-label="Position Y">
+          <input class="tp-input" id="tp-ry" type="number" step="1"   value="0" aria-label="Rotation Y (°)">
+          <input class="tp-input" id="tp-sy" type="number" step="0.1" value="1" min="0.01" aria-label="Skalierung Y">
+        </div>
+        <div class="tp-row">
+          <span class="tp-label">Z</span>
+          <input class="tp-input" id="tp-pz" type="number" step="0.1" value="0" aria-label="Position Z">
+          <input class="tp-input" id="tp-rz" type="number" step="1"   value="0" aria-label="Rotation Z (°)">
+          <input class="tp-input" id="tp-sz" type="number" step="0.1" value="1" min="0.01" aria-label="Skalierung Z">
+        </div>
+        <div class="tp-header">
+          <span>Position</span><span>Rotation °</span><span>Skalierung</span>
+        </div>
+      </div>
+
     </main>
   </div>
 
@@ -97,6 +136,8 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
   <!-- OrbitControls -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <!-- TransformControls -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
 
   <!-- App logic -->
   <script src="app.js"></script>
