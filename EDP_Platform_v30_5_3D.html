@@ -1294,84 +1294,172 @@ function WashingMachine3D({canvasRef}){
     const T=window.THREE;
     const cv=canvasRef.current, par=cv.parentElement;
     const W=par.clientWidth||500, H=par.clientHeight||380;
+
+    // ── Renderer: PBR pipeline ──
     const renderer=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:false});
     renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-    renderer.setClearColor(0x03050a,1);
+    renderer.setClearColor(0x050810,1);
     renderer.shadowMap.enabled=true;
+    renderer.shadowMap.type=T.PCFSoftShadowMap;
+    renderer.toneMapping=T.ACESFilmicToneMapping;
+    renderer.toneMappingExposure=1.35;
     renderer.setSize(W,H);
+
     const scene=new T.Scene();
-    const cam=new T.PerspectiveCamera(42,W/H,0.05,50);
-    cam.position.set(1.1,0.85,1.8);
-    // Lights
-    scene.add(new T.AmbientLight(0xffffff,0.55));
-    const sun=new T.DirectionalLight(0xffffff,0.9); sun.position.set(3,5,3); sun.castShadow=true; scene.add(sun);
-    const rim=new T.DirectionalLight(0x4488ff,0.35); rim.position.set(-3,0,-2); scene.add(rim);
-    const fill=new T.DirectionalLight(0xffeedd,0.2); fill.position.set(0,2,-3); scene.add(fill);
-    // Controls
+    scene.fog=new T.FogExp2(0x050810,0.28);
+
+    const cam=new T.PerspectiveCamera(36,W/H,0.05,30);
+    cam.position.set(1.3,1.05,1.9);
+
+    // ── Lighting ──
+    scene.add(new T.AmbientLight(0xffffff,0.25));
+    // Key light (warm, top-left-front, with soft shadows)
+    const key=new T.DirectionalLight(0xfff4e8,2.8);
+    key.position.set(-2,5,3); key.castShadow=true;
+    key.shadow.mapSize.width=2048; key.shadow.mapSize.height=2048;
+    key.shadow.camera.left=-1.2; key.shadow.camera.right=1.2;
+    key.shadow.camera.top=1.8; key.shadow.camera.bottom=-0.2;
+    key.shadow.camera.near=0.5; key.shadow.camera.far=12;
+    key.shadow.bias=-0.0005; key.shadow.normalBias=0.02;
+    scene.add(key);
+    // Fill light (cool, from right)
+    const fill=new T.DirectionalLight(0xc8e0ff,0.9); fill.position.set(3,1,-1); scene.add(fill);
+    // Rim light (from behind, accent)
+    const rim=new T.DirectionalLight(0x6699cc,1.2); rim.position.set(-1,1.5,-3); scene.add(rim);
+    // Hemisphere (sky/ground)
+    scene.add(new T.HemisphereLight(0x7aaaff,0x301a08,0.5));
+    // Drum interior glow
+    const drumPt=new T.PointLight(0x4499ff,2.2,0.55); drumPt.position.set(0,0.45,0.22); scene.add(drumPt);
+    // Top panel accent
+    const topPt=new T.PointLight(0x3366ff,0.8,0.40); topPt.position.set(0,0.92,0.30); scene.add(topPt);
+
+    // ── OrbitControls ──
     const ctrl=new T.OrbitControls(cam,renderer.domElement);
-    ctrl.enableDamping=true; ctrl.dampingFactor=0.08;
-    ctrl.target.set(0,0.45,0); ctrl.minDistance=0.8; ctrl.maxDistance=5; ctrl.update();
-    // Materials
-    const mW=new T.MeshPhongMaterial({color:0xf2f2f4,shininess:90});
-    const mG=new T.MeshPhongMaterial({color:0x4a5568,shininess:50});
-    const mDk=new T.MeshPhongMaterial({color:0x1a202c,shininess:20});
-    const mSt=new T.MeshPhongMaterial({color:0x8fa5b8,shininess:150});
-    const mGl=new T.MeshPhongMaterial({color:0x90caf9,transparent:true,opacity:0.32,shininess:250,side:T.DoubleSide});
-    const mB=new T.MeshPhongMaterial({color:0x3b82f6,shininess:120,emissive:0x1a3a7a,emissiveIntensity:0.3});
-    const mRub=new T.MeshPhongMaterial({color:0x181825,shininess:8});
-    const mLed=new T.MeshPhongMaterial({color:0x34d399,emissive:0x34d399,emissiveIntensity:0.8,shininess:40});
-    // ── Body ──
+    ctrl.enableDamping=true; ctrl.dampingFactor=0.06;
+    ctrl.target.set(0,0.45,0); ctrl.minDistance=0.55; ctrl.maxDistance=4; ctrl.update();
+
+    // ── PBR Materials ──
+    const mWhite =new T.MeshStandardMaterial({color:0xf4f6f9,metalness:0.0,roughness:0.06});
+    const mWhite2=new T.MeshStandardMaterial({color:0xeaedf2,metalness:0.0,roughness:0.12});
+    const mGray  =new T.MeshStandardMaterial({color:0x303848,metalness:0.08,roughness:0.55});
+    const mDark  =new T.MeshStandardMaterial({color:0x0a0e16,metalness:0.04,roughness:0.80});
+    const mChrome=new T.MeshStandardMaterial({color:0xd0e0ec,metalness:0.96,roughness:0.06});
+    const mDrum  =new T.MeshStandardMaterial({color:0x8faec0,metalness:0.88,roughness:0.12,side:T.DoubleSide});
+    const mGlass =new T.MeshStandardMaterial({color:0x8ec8ff,metalness:0.05,roughness:0.02,transparent:true,opacity:0.22,side:T.DoubleSide});
+    const mBlue  =new T.MeshStandardMaterial({color:0x1a40c0,metalness:0.18,roughness:0.35,emissive:0x0a1a60,emissiveIntensity:0.3});
+    const mRubber=new T.MeshStandardMaterial({color:0x0e1218,metalness:0.0,roughness:0.96});
+    const mLED   =new T.MeshStandardMaterial({color:0x34d399,emissive:0x34d399,emissiveIntensity:1.5,roughness:0.4,metalness:0});
+    const mDisp  =new T.MeshStandardMaterial({color:0x1e3a8a,emissive:0x3b82f6,emissiveIntensity:0.7,roughness:0.5});
+    const mFloor =new T.MeshStandardMaterial({color:0x080d18,metalness:0.06,roughness:0.75});
+
     const grp=new T.Group();
-    const bdy=new T.Mesh(new T.BoxGeometry(0.6,0.85,0.56),mW); bdy.position.set(0,0.425,0); bdy.castShadow=true; bdy.receiveShadow=true; grp.add(bdy);
+
+    // ── Floor (shadow receiver + subtle reflection) ──
+    const floor=new T.Mesh(new T.PlaneGeometry(8,8),mFloor);
+    floor.rotation.x=-Math.PI/2; floor.receiveShadow=true; scene.add(floor);
+    // Subtle grid
+    const grid=new T.GridHelper(5,50,0x0d1f38,0x060e1c); grid.position.y=0.001; scene.add(grid);
+
+    // ── Main body ──
+    const body=new T.Mesh(new T.BoxGeometry(0.600,0.850,0.560),mWhite);
+    body.position.set(0,0.425,0); body.castShadow=true; body.receiveShadow=true; grp.add(body);
+
     // Top panel
-    const top=new T.Mesh(new T.BoxGeometry(0.6,0.09,0.56),mG); top.position.set(0,0.895,0); grp.add(top);
-    // Control display area
-    const disp=new T.Mesh(new T.BoxGeometry(0.28,0.055,0.01),mDk); disp.position.set(-0.03,0.9,0.282); grp.add(disp);
-    // LED stripe on display
-    const led=new T.Mesh(new T.BoxGeometry(0.22,0.006,0.005),mLed); led.position.set(-0.03,0.91,0.284); grp.add(led);
-    // Program dial
-    const dial=new T.Mesh(new T.CylinderGeometry(0.038,0.038,0.012,24),mB); dial.rotation.x=Math.PI/2; dial.position.set(0.2,0.895,0.284); grp.add(dial);
-    const dMrk=new T.Mesh(new T.BoxGeometry(0.004,0.028,0.004),new T.MeshPhongMaterial({color:0xffffff})); dMrk.position.set(0.2,0.895+0.025,0.284); grp.add(dMrk);
+    const topP=new T.Mesh(new T.BoxGeometry(0.600,0.090,0.560),mGray);
+    topP.position.set(0,0.895,0); topP.castShadow=true; grp.add(topP);
+
+    // Control fascia (dark strip)
+    const fascia=new T.Mesh(new T.BoxGeometry(0.590,0.072,0.012),mDark);
+    fascia.position.set(0,0.896,0.280); grp.add(fascia);
+
+    // Display screen (glowing blue)
+    const dispBg=new T.Mesh(new T.BoxGeometry(0.215,0.044,0.006),mDark);
+    dispBg.position.set(-0.055,0.897,0.283); grp.add(dispBg);
+    const dispScr=new T.Mesh(new T.BoxGeometry(0.200,0.038,0.003),mDisp);
+    dispScr.position.set(-0.055,0.897,0.284); grp.add(dispScr);
+
+    // LED indicator bar
+    const ledBar=new T.Mesh(new T.BoxGeometry(0.170,0.005,0.003),mLED);
+    ledBar.position.set(-0.055,0.909,0.284); grp.add(ledBar);
+
+    // Program knob (chrome bezel + blue center)
+    const knobBezel=new T.Mesh(new T.CylinderGeometry(0.036,0.036,0.008,32),mChrome);
+    knobBezel.rotation.x=Math.PI/2; knobBezel.position.set(0.200,0.897,0.282); grp.add(knobBezel);
+    const knobCenter=new T.Mesh(new T.CylinderGeometry(0.026,0.026,0.008,24),mBlue);
+    knobCenter.rotation.x=Math.PI/2; knobCenter.position.set(0.200,0.897,0.283); grp.add(knobCenter);
+    const knobTick=new T.Mesh(new T.BoxGeometry(0.003,0.018,0.003),new T.MeshStandardMaterial({color:0xffffff,emissive:0xffffff,emissiveIntensity:0.8}));
+    knobTick.position.set(0.200,0.914,0.284); grp.add(knobTick);
+
+    // Power button
+    const pwBtn=new T.Mesh(new T.CylinderGeometry(0.013,0.013,0.007,20),mBlue);
+    pwBtn.rotation.x=Math.PI/2; pwBtn.position.set(0.228,0.868,0.283); grp.add(pwBtn);
+    const pwLed=new T.Mesh(new T.SphereGeometry(0.004,8,8),mLED);
+    pwLed.position.set(0.228,0.868,0.287); grp.add(pwLed);
+
     // Detergent drawer
-    const drw=new T.Mesh(new T.BoxGeometry(0.16,0.045,0.09),mG); drw.position.set(0.18,0.8,0.284); grp.add(drw);
-    const drwH=new T.Mesh(new T.BoxGeometry(0.16,0.01,0.005),mB); drwH.position.set(0.18,0.795,0.288); grp.add(drwH);
-    // ── Door system ──
-    const rubGeo=new T.TorusGeometry(0.19,0.022,18,48); const rub=new T.Mesh(rubGeo,mRub); rub.rotation.x=Math.PI/2; rub.position.set(0,0.45,0.28); grp.add(rub);
-    // Door outer ring (chrome)
-    const dRingGeo=new T.TorusGeometry(0.195,0.012,12,48); const dRing=new T.Mesh(dRingGeo,mSt); dRing.rotation.x=Math.PI/2; dRing.position.set(0,0.45,0.282); grp.add(dRing);
-    // Door glass
-    const gl=new T.Mesh(new T.CircleGeometry(0.175,48),mGl); gl.position.set(0,0.45,0.284); grp.add(gl);
-    // Door handle
-    const hndl=new T.Mesh(new T.CylinderGeometry(0.012,0.012,0.12,12),mSt); hndl.rotation.z=Math.PI/2; hndl.position.set(0.19,0.45,0.29); grp.add(hndl);
-    // ── Drum (inside, visible through glass) ──
-    const drum=new T.Mesh(new T.CylinderGeometry(0.155,0.155,0.32,36),mSt); drum.rotation.x=Math.PI/2; drum.position.set(0,0.45,0.1); grp.add(drum);
-    // Drum baffles
+    const drw=new T.Mesh(new T.BoxGeometry(0.150,0.040,0.094),mWhite2);
+    drw.position.set(0.180,0.800,0.281); grp.add(drw);
+    const drwH=new T.Mesh(new T.BoxGeometry(0.140,0.009,0.005),mBlue);
+    drwH.position.set(0.180,0.793,0.285); grp.add(drwH);
+
+    // ── Door assembly ──
+    // Rubber boot seal (wide dark torus)
+    const seal=new T.Mesh(new T.TorusGeometry(0.188,0.025,20,64),mRubber);
+    seal.rotation.x=Math.PI/2; seal.position.set(0,0.45,0.276); seal.castShadow=true; grp.add(seal);
+    // Chrome door ring
+    const dring=new T.Mesh(new T.TorusGeometry(0.194,0.010,14,64),mChrome);
+    dring.rotation.x=Math.PI/2; dring.position.set(0,0.45,0.279); grp.add(dring);
+    // Glass porthole
+    const glass=new T.Mesh(new T.CircleGeometry(0.175,64),mGlass);
+    glass.position.set(0,0.45,0.281); grp.add(glass);
+    // Inner drum ring (chrome detail around glass)
+    const innerRing=new T.Mesh(new T.TorusGeometry(0.178,0.005,10,48),mChrome);
+    innerRing.rotation.x=Math.PI/2; innerRing.position.set(0,0.45,0.282); grp.add(innerRing);
+    // Handle bar (chrome)
+    const hbar=new T.Mesh(new T.CylinderGeometry(0.011,0.011,0.100,16),mChrome);
+    hbar.rotation.z=Math.PI/2; hbar.position.set(0.184,0.45,0.290); hbar.castShadow=true; grp.add(hbar);
+    for(const hx of [-0.044,0.044]){
+      grp.add(Object.assign(new T.Mesh(new T.SphereGeometry(0.012,12,10),mChrome),{position:new T.Vector3(0.184+hx,0.45,0.290)}));
+    }
+
+    // ── Inner drum ──
+    const drum=new T.Mesh(new T.CylinderGeometry(0.150,0.150,0.300,48,1,true),mDrum);
+    drum.rotation.x=Math.PI/2; drum.position.set(0,0.45,0.115); grp.add(drum);
+    const drumBack=new T.Mesh(new T.CircleGeometry(0.148,48),mDrum);
+    drumBack.rotation.x=Math.PI/2; drumBack.position.set(0,0.45,-0.036); grp.add(drumBack);
+    // Lifter baffles
     for(let i=0;i<3;i++){
       const a=(i/3)*Math.PI*2;
-      const bf=new T.Mesh(new T.BoxGeometry(0.022,0.28,0.018),mG);
+      const bf=new T.Mesh(new T.BoxGeometry(0.016,0.260,0.012),new T.MeshStandardMaterial({color:0x8faec0,metalness:0.82,roughness:0.18}));
       bf.rotation.x=Math.PI/2; bf.rotation.z=a;
-      bf.position.set(Math.cos(a)*0.1,0.45+Math.sin(a)*0.1,0.12); grp.add(bf);
+      bf.position.set(Math.cos(a)*0.096,0.45+Math.sin(a)*0.096,0.115); grp.add(bf);
     }
-    // Drum holes (simplified circles as small discs)
-    for(let r=0;r<3;r++) for(let c=0;c<8;c++){
-      const a=(c/8)*Math.PI*2, rad=0.06+r*0.04;
-      const h=new T.Mesh(new T.CircleGeometry(0.008,8),mDk);
-      h.position.set(Math.cos(a)*rad,0.45+Math.sin(a)*rad,0.265); grp.add(h);
+    // Drum perforations
+    for(let r=0;r<3;r++) for(let c=0;c<12;c++){
+      const a=(c/12)*Math.PI*2, rad=0.052+r*0.036;
+      const hole=new T.Mesh(new T.CircleGeometry(0.0058,6),mDark);
+      hole.position.set(Math.cos(a)*rad,0.45+Math.sin(a)*rad,0.268); grp.add(hole);
     }
-    // ── Bottom detail ──
-    const bot=new T.Mesh(new T.BoxGeometry(0.6,0.04,0.56),mG); bot.position.set(0,0.02,0); grp.add(bot);
-    // Filter cap
-    const flt=new T.Mesh(new T.CylinderGeometry(0.025,0.025,0.005,12),mB); flt.rotation.x=Math.PI/2; flt.position.set(-0.2,-0.005,0.282); grp.add(flt);
-    // Feet
-    [[-0.23,-0.24],[0.23,-0.24],[-0.23,0.24],[0.23,0.24]].forEach(([x,z])=>{
-      const f=new T.Mesh(new T.CylinderGeometry(0.022,0.026,0.038,10),mRub); f.position.set(x,-0.019,z); grp.add(f);
-    });
-    // Power light
-    const pw=new T.Mesh(new T.CircleGeometry(0.007,8),mLed); pw.position.set(0.25,0.895,0.284); grp.add(pw);
+
+    // ── Base / feet ──
+    const base=new T.Mesh(new T.BoxGeometry(0.600,0.036,0.560),mGray);
+    base.position.set(0,0.018,0); base.castShadow=true; grp.add(base);
+    // Filter access cap (blue accent)
+    const flt=new T.Mesh(new T.CylinderGeometry(0.022,0.022,0.005,16),mBlue);
+    flt.rotation.x=Math.PI/2; flt.position.set(-0.20,0.001,0.280); grp.add(flt);
+    const fltRing=new T.Mesh(new T.TorusGeometry(0.022,0.003,6,16),mChrome);
+    fltRing.rotation.x=Math.PI/2; fltRing.position.set(-0.20,0.001,0.281); grp.add(fltRing);
+    // Feet (4)
+    for(const[fx,fz] of [[-0.228,-0.220],[0.228,-0.220],[-0.228,0.220],[0.228,0.220]]){
+      const ft=new T.Mesh(new T.CylinderGeometry(0.019,0.023,0.034,12),mRubber);
+      ft.position.set(fx,-0.017,fz); ft.castShadow=true; grp.add(ft);
+      const fr=new T.Mesh(new T.TorusGeometry(0.020,0.003,6,16),mChrome);
+      fr.position.set(fx,0.001,fz); grp.add(fr);
+    }
+
     scene.add(grp);
-    // Floor grid
-    const grid=new T.GridHelper(3,30,0x1e293b,0x0d1117); scene.add(grid);
-    // Slow rotation animation
+
+    // ── Animation ──
     let running=true, t=0;
     const ro=new ResizeObserver(()=>{
       if(!par)return;
@@ -1381,7 +1469,10 @@ function WashingMachine3D({canvasRef}){
     const loop=()=>{
       if(!running)return;
       requestAnimationFrame(loop);
-      t+=0.003; grp.rotation.y=Math.sin(t)*0.18;
+      t+=0.0035;
+      grp.rotation.y=Math.sin(t)*0.14;
+      drumPt.intensity=1.8+Math.sin(t*2.8)*0.4;
+      ledBar.material.emissiveIntensity=1.2+Math.sin(t*4)*0.3;
       ctrl.update(); renderer.render(scene,cam);
     }; loop();
     return()=>{ running=false; ro.disconnect(); renderer.dispose(); };
