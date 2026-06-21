@@ -1389,105 +1389,465 @@ function WashingMachine3D({canvasRef}){
   return null;
 }
 
+/* ─── Assembly Groups & Parts Database ───────────────────────────────────── */
+const PART_GROUPS_META=[
+  {id:'gehaeuse',    name:'Gehäuse',            col:'#60a5fa', count:120,  totalCost:  892.40},
+  {id:'tuer',        name:'Tür-Baugruppe',       col:'#a78bfa', count: 90,  totalCost:  418.60},
+  {id:'trommel',     name:'Trommel-Baugruppe',   col:'#34d399', count:160,  totalCost: 1240.80},
+  {id:'antrieb',     name:'Antrieb & Motor',     col:'#fbbf24', count:110,  totalCost:  864.50},
+  {id:'wasser',      name:'Wasserführung',        col:'#38bdf8', count: 70,  totalCost:  312.90},
+  {id:'heizung',     name:'Heizelement',          col:'#f87171', count: 18,  totalCost:   98.40},
+  {id:'aufhaengung', name:'Aufhängung',           col:'#fb923c', count: 80,  totalCost:  224.70},
+  {id:'elektronik',  name:'Elektronik & PCB',    col:'#c084fc', count:550,  totalCost:  748.20},
+  {id:'schublade',   name:'Waschmittelschublade', col:'#4ade80', count: 40,  totalCost:   62.30},
+  {id:'kabelbaum',   name:'Kabelbaum',            col:'#94a3b8', count:500,  totalCost:  184.60},
+  {id:'befestigung', name:'Befestigungsmittel',   col:'#64748b', count:8312, totalCost:  482.10},
+];
+const TOTAL_PARTS=PART_GROUPS_META.reduce((s,g)=>s+g.count,0);
+const TOTAL_COST=PART_GROUPS_META.reduce((s,g)=>s+g.totalCost,0);
+
+function buildGroupParts(gid){
+  const parts=[];
+  let seq=0;
+  function mk(nm,type,mat,cost,sup,stage,prog,risk,dims,wt){
+    seq++;
+    parts.push({
+      id:`BSH-WM-${gid.slice(0,3).toUpperCase()}-${String(seq).padStart(4,'0')}`,
+      name:nm, type, mat, cost:`${cost} EUR`, sup, stage,
+      prog: typeof prog==='number'?prog:100,
+      risk:!!risk, dims, wt:`${wt} kg`
+    });
+  }
+  /* ── Gehäuse ── */
+  if(gid==='gehaeuse'){
+    const panels=[['Panel Oben','600×560×25 mm','2.10'],['Panel Unten','600×560×20 mm','1.95'],['Panel Links','25×560×900 mm','3.20'],['Panel Rechts','25×560×900 mm','3.20'],['Panel Rückseite','600×20×900 mm','4.10'],['Sockelblende','600×560×80 mm','1.80']];
+    panels.forEach(([n,d,w])=>mk(n,'Kaufteil','Stahlblech DC01 0.8mm','28.40','ThyssenKrupp',  'Freigegeben',100,0,d,w));
+    for(let i=1;i<=12;i++) mk(`Rahmenprofil ${i:02}`.replace(':02','').padEnd(20),'Kaufteil','Stahlrohr 20×20×1.5mm','12.60','SSAB','Freigegeben',100,0,'900mm L','0.85');
+    for(let i=1;i<=12;i++) mk(`Rahmenprofil_${String(i).padStart(2,'0')}`,'Kaufteil','Stahlrohr 20×20×1.5mm','12.60','SSAB','Freigegeben',100,0,'900mm L','0.85');
+    for(let i=1;i<=4;i++) mk(`Nivellierfuß_${i}`,'Kaufteil','PA66 GF30','4.20','Freudenberg','Freigegeben',100,0,'Ø50×60mm','0.12');
+    for(let i=1;i<=4;i++) mk(`Fuss_Gummimatte_${i}`,'Kaufteil','EPDM','1.80','Freudenberg','Freigegeben',100,0,'Ø56×8mm','0.04');
+    for(let i=1;i<=4;i++) mk(`Fuss_Kontermutter_${i}`,'Normteil','Stahl verz.','0.40','Würth','Freigegeben',100,0,'M14','0.02');
+    mk('Türausschnitt-Verstärkungsring','Kaufteil','Stahlblech DC04 1.2mm','18.90','ThyssenKrupp','Freigegeben',100,0,'Ø430mm','1.40');
+    for(let i=1;i<=30;i++) mk(`Kabelclip_Gehäuse_${String(i).padStart(2,'0')}`,'Kaufteil','PP','0.08','Richco','Freigegeben',100,0,'18×8×12mm','0.003');
+    for(let i=1;i<=20;i++) mk(`Haltewinkel_${String(i).padStart(2,'0')}`,'Eigenteil','Stahlblech DC01','1.20','Eigenfertigung Traunreut','Freigegeben',100,0,'30×30×5mm','0.06');
+  }
+  /* ── Tür ── */
+  else if(gid==='tuer'){
+    mk('Tür Außenring','Kaufteil','Stahlblech DC01 0.8mm','22.40','Autoneum','Freigegeben',100,0,'Ø430mm','0.95');
+    mk('Tür Innenring','Kaufteil','Stahlblech DC01 0.6mm','18.60','Autoneum','Freigegeben',100,0,'Ø410mm','0.72');
+    mk('Türglas','Kaufteil','Sicherheitsglas ESG 4mm','14.80','Saint-Gobain','Freigegeben',100,0,'Ø360mm','1.10');
+    ['Links','Rechts'].forEach(s=>{
+      mk(`Scharnier ${s} Körper`,'Kaufteil','Zinkdruckguss','8.40','Kiekert','Freigegeben',100,0,'70×20×60mm','0.18');
+      mk(`Scharnier ${s} Bolzen`,'Normteil','Stahl C45','1.20','Würth','Freigegeben',100,0,'Ø10×80mm','0.06');
+      mk(`Scharnier ${s} Feder`,'Kaufteil','Federstahl','0.80','Gutekunst','Freigegeben',100,0,'Ø8×40mm','0.02');
+      mk(`Scharnier ${s} Scheibe 1`,'Normteil','Stahl verz.','0.10','Würth','Freigegeben',100,0,'Ø16×3mm','0.01');
+      mk(`Scharnier ${s} Scheibe 2`,'Normteil','Stahl verz.','0.10','Würth','Freigegeben',100,0,'Ø16×3mm','0.01');
+      mk(`Scharnier ${s} Platte`,'Eigenteil','Stahlblech DC01','4.20','Eigenfertigung Traunreut','Freigegeben',100,0,'80×15×50mm','0.12');
+      mk(`Scharnier ${s} Stopfen`,'Kaufteil','PE','0.20','Richco','Freigegeben',100,0,'Ø12×8mm','0.005');
+      mk(`Scharnier ${s} Clip`,'Kaufteil','PA66','0.15','Richco','Freigegeben',100,0,'10×6×14mm','0.004');
+    });
+    mk('Griff Körper','Kaufteil','ABS Chrom-optik','12.60','Rosti','Freigegeben',100,0,'140×22×30mm','0.28');
+    mk('Griff Innenhalter','Kaufteil','PP','2.40','Rosti','Freigegeben',100,0,'130×10×20mm','0.08');
+    mk('Griff Achse','Normteil','Stahl C45','1.10','Würth','Freigegeben',100,0,'Ø8×140mm','0.07');
+    mk('Griff Feder','Kaufteil','Federstahl','0.60','Gutekunst','Freigegeben',100,0,'Ø6×40mm','0.01');
+    mk('Griff Abdeckung','Kaufteil','ABS','3.80','Rosti','Freigegeben',100,0,'150×6×35mm','0.12');
+    mk('Türschloss Gehäuse','Kaufteil','PA66 GF15','6.40','Kiekert','Freigegeben',100,0,'60×30×80mm','0.14');
+    mk('Türschloss Haken','Kaufteil','Stahl geh.','2.20','Kiekert','Freigegeben',100,0,'20×15×35mm','0.04');
+    mk('Türschloss Feder','Kaufteil','Federstahl','0.40','Gutekunst','Freigegeben',100,0,'Ø8×30mm','0.008');
+    mk('Türschloss Magnet','Kaufteil','NdFeB','1.80','Arnold Magnetics','Freigegeben',100,0,'15×10×18mm','0.018');
+    mk('Türschloss Spule','Kaufteil','Cu-Lackdraht','2.60','Oswald','Freigegeben',100,0,'Ø16×20mm','0.06');
+    mk('Türschloss Anker','Kaufteil','Weicheisen','1.40','Vacuumschmelze','Freigegeben',100,0,'12×8×15mm','0.01');
+    mk('Türschloss Achse','Normteil','Stahl C45','0.60','Würth','Freigegeben',100,0,'Ø6×25mm','0.006');
+    mk('Türschloss Deckel','Kaufteil','PA66','2.80','Kiekert','Freigegeben',100,0,'65×12×85mm','0.09');
+    for(let i=1;i<=24;i++) mk(`Manschette Segment ${String(i).padStart(2,'0')}`,'Kaufteil','EPDM 60 Shore','3.20','Freudenberg Sealing','Freigegeben',100,0,'Sektor 15°','0.04');
+    mk('Manschette Spannring','Kaufteil','Federstahl','4.10','Gutekunst','Freigegeben',100,0,'Ø390mm','0.18');
+    mk('Manschette Klemmfeder','Kaufteil','Federstahl','2.80','Gutekunst','Freigegeben',100,0,'Ø376mm','0.12');
+  }
+  /* ── Trommel ── */
+  else if(gid==='trommel'){
+    mk('Laugenbehälter Vorne','Eigenteil','PP UV-stabil','48.60','Eigenfertigung Traunreut','Freigegeben',100,0,'Ø480×480mm','3.20');
+    mk('Laugenbehälter Hinten','Eigenteil','PP UV-stabil','38.40','Eigenfertigung Traunreut','Freigegeben',100,0,'Ø480×20mm','1.10');
+    mk('Laugenbehälter Dichtung','Kaufteil','EPDM','5.40','Freudenberg Sealing','Freigegeben',100,0,'Ø470mm','0.08');
+    mk('Trommel Mantel','Eigenteil','Edelstahl 1.4301 0.8mm','82.40','ThyssenKrupp Nirosta','Freigegeben',100,0,'Ø420×440mm','4.80');
+    mk('Trommel Front','Eigenteil','Edelstahl 1.4301','24.60','ThyssenKrupp Nirosta','Freigegeben',100,0,'Ø416×12mm','1.20');
+    mk('Trommel Rückseite','Eigenteil','Edelstahl 1.4301','22.80','ThyssenKrupp Nirosta','Freigegeben',100,0,'Ø416×15mm','1.10');
+    for(let i=1;i<=3;i++){mk(`Mitnehmer ${i} Körper`,'Eigenteil','PP GF20','4.80','Eigenfertigung Traunreut','Freigegeben',100,0,'25×400×25mm','0.18');mk(`Mitnehmer ${i} Abdeckung`,'Eigenteil','PP','2.40','Eigenfertigung Traunreut','Freigegeben',100,0,'28×400×10mm','0.09');mk(`Mitnehmer ${i} Schraube 1`,'Normteil','Stahl A2','0.08','Würth','Freigegeben',100,0,'M4×12mm','0.003');mk(`Mitnehmer ${i} Schraube 2`,'Normteil','Stahl A2','0.08','Würth','Freigegeben',100,0,'M4×12mm','0.003');}
+    mk('Trommelwelle','Eigenteil','Stahl C60 geh.','28.40','Lüttgens & Mosler','Freigegeben',100,0,'Ø44×180mm','2.10');
+    mk('Trommel Flansch','Eigenteil','Grauguss GG-25','18.60','Eisengießerei Bochum','Freigegeben',100,0,'Ø160×18mm','1.40');
+    mk('Trommelwelle Keil','Normteil','Stahl C45','0.80','Würth','Freigegeben',100,0,'6×6×60mm','0.017');
+    mk('Spinne Nabe','Eigenteil','Zinkdruckguss','14.20','Druckguss Heidenheim','Freigegeben',100,0,'Ø80×30mm','0.62');
+    for(let i=1;i<=3;i++) mk(`Spinne Arm ${i}`,'Eigenteil','Zinkdruckguss','8.60','Druckguss Heidenheim','Freigegeben',100,0,'200×20×30mm','0.44');
+    ['Vorne','Hinten'].forEach(s=>{
+      mk(`Lager ${s} Außenring`,'Kaufteil','Stahl 100Cr6','8.40','Schaeffler FAG','Freigegeben',100,0,'Ø105×Ø72×25mm','0.28');
+      mk(`Lager ${s} Innenring`,'Kaufteil','Stahl 100Cr6','6.80','Schaeffler FAG','Freigegeben',100,0,'Ø72×Ø44×25mm','0.18');
+      mk(`Lager ${s} Käfig`,'Kaufteil','Messing','2.40','Schaeffler FAG','Freigegeben',100,0,'Ø82mm','0.04');
+      for(let k=1;k<=16;k++) mk(`Lager ${s} Kugel ${String(k).padStart(2,'0')}`,'Kaufteil','Stahl 100Cr6','0.40','Schaeffler FAG','Freigegeben',100,0,'Ø14mm','0.011');
+    });
+    mk('Wellendichtring Vorne','Kaufteil','NBR 70 Shore','3.20','Freudenberg Sealing','Freigegeben',100,0,'Ø56×Ø44×10mm','0.018');
+    mk('Wellendichtring Hinten','Kaufteil','NBR 70 Shore','3.20','Freudenberg Sealing','Freigegeben',100,0,'Ø56×Ø44×10mm','0.018');
+    for(let i=1;i<=3;i++){mk(`Gegengewicht ${i} Betonblock`,'Kaufteil','Spezialbeton','18.40','Liapor','Freigegeben',100,0,'400×60×300mm','4.80');for(let b=1;b<=4;b++){mk(`GG${i} Bolzen ${b}`,'Normteil','Stahl 8.8','0.28','Würth','Freigegeben',100,0,'M10×75mm','0.042');mk(`GG${i} Mutter ${b}`,'Normteil','Stahl 8.8','0.08','Würth','Freigegeben',100,0,'M10','0.010');mk(`GG${i} Scheibe ${b}`,'Normteil','Stahl verz.','0.04','Würth','Freigegeben',100,0,'Ø20×3mm','0.006');}}
+    mk('Lagergehäuse Vorne','Eigenteil','Aluminium AlSi9Cu3','22.60','Druckguss Heidenheim','Freigegeben',100,0,'120×30×120mm','0.86');
+    mk('Lagergehäuse Hinten','Eigenteil','Aluminium AlSi9Cu3','22.60','Druckguss Heidenheim','Freigegeben',100,0,'120×30×120mm','0.86');
+    for(let i=1;i<=50;i++) mk(`Trommel Lochgruppe ${String(i).padStart(2,'0')} (10 Loch)`,'Eigenteil','Edelstahl 1.4301','0.00','Eigenfertigung Traunreut','Freigegeben',100,0,'Ø6mm×10','0.001');
+  }
+  /* ── Antrieb & Motor ── */
+  else if(gid==='antrieb'){
+    mk('Motor Statorpaket','Kaufteil','Elektroblech M250-35A','48.40','Voestalpine','Freigegeben',100,0,'Ø176×180mm','4.20');
+    mk('Motor Rotor','Kaufteil','Elektroblech + Permanentmagnete','62.80','Vacuumschmelze','Freigegeben',100,0,'Ø144×170mm','2.80');
+    mk('Motor Welle','Eigenteil','Stahl C60 geh.','18.40','Lüttgens & Mosler','Freigegeben',100,0,'Ø24×220mm','0.80');
+    mk('Motor Gehäuse Vorne','Kaufteil','Aluminium AlSi9Cu3','22.60','Druckguss Heidenheim','Freigegeben',100,0,'Ø190×20mm','0.94');
+    mk('Motor Gehäuse Hinten','Kaufteil','Aluminium AlSi9Cu3','22.60','Druckguss Heidenheim','Freigegeben',100,0,'Ø190×20mm','0.94');
+    mk('Motor Lüfterrad','Kaufteil','PP GF15','4.80','Hella Kunststoffe','Freigegeben',100,0,'Ø140×18mm','0.14');
+    mk('Motor Lüfterhaube','Kaufteil','PP','3.20','Hella Kunststoffe','Freigegeben',100,0,'Ø160×22mm','0.09');
+    mk('Motor Lager antriebsseitig','Kaufteil','Stahl 100Cr6 – 6206-2Z','4.80','Schaeffler INA','Freigegeben',100,0,'Ø62×Ø30×16mm','0.14');
+    mk('Motor Lager lüfterseitig','Kaufteil','Stahl 100Cr6 – 6206-2Z','4.80','Schaeffler INA','Freigegeben',100,0,'Ø62×Ø30×16mm','0.14');
+    for(let ph=1;ph<=3;ph++){for(let e=1;e<=2;e++){mk(`Wicklung Phase${ph} Ende${e}`,'Kaufteil','Cu-Lackdraht 1.2mm','8.40','Oswald Elektromotoren','Freigegeben',100,0,'Wickelkopf','0.42');}}
+    mk('Kohlebürste 1','Kaufteil','Graphit EG8','2.40','Schunk Carbon','Freigegeben',100,0,'8×20×8mm','0.014');
+    mk('Kohlebürste 2','Kaufteil','Graphit EG8','2.40','Schunk Carbon','Freigegeben',100,0,'8×20×8mm','0.014');
+    mk('Bürstenhalter 1','Kaufteil','Messing MS63','1.80','Schunk Carbon','Freigegeben',100,0,'14×30×14mm','0.022');
+    mk('Bürstenhalter 2','Kaufteil','Messing MS63','1.80','Schunk Carbon','Freigegeben',100,0,'14×30×14mm','0.022');
+    mk('Motor Montageplatte','Eigenteil','Stahlblech DC01 2.0mm','14.60','Eigenfertigung Traunreut','Freigegeben',100,0,'220×12×240mm','1.02');
+    for(let i=1;i<=8;i++) mk(`Motor Schraube ${i}`,'Normteil','Stahl A2-70','0.12','Würth','Freigegeben',100,0,'M6×30mm','0.009');
+    for(let i=1;i<=20;i++) mk(`Antriebsriemen Seg ${String(i).padStart(2,'0')}`,'Kaufteil','EPDM Keilriemen','1.20','Gates','Freigegeben',100,0,'Segment','0.04');
+    mk('Riemenscheibe Motor','Eigenteil','Aluminium EN-AW 6082','12.40','Druckguss Heidenheim','Freigegeben',100,0,'Ø90×30mm','0.24');
+    mk('Riemenscheibe Trommel','Eigenteil','Aluminium EN-AW 6082','28.60','Druckguss Heidenheim','Freigegeben',100,0,'Ø250×25mm','1.10');
+    mk('Riemenspanner Halter','Eigenteil','Stahlblech DC01','6.40','Eigenfertigung Traunreut','Freigegeben',100,0,'40×15×80mm','0.18');
+    mk('Riemenspanner Arm','Eigenteil','Stahlblech DC01','3.20','Eigenfertigung Traunreut','Freigegeben',100,0,'12×12×60mm','0.07');
+    mk('Riemenspanner Rolle','Kaufteil','Stahl + POM','4.80','Schaeffler INA','Freigegeben',100,0,'Ø40×22mm','0.08');
+    mk('Riemenspanner Bolzen','Normteil','Stahl C45','1.20','Würth','Freigegeben',100,0,'M10×40mm','0.025');
+    mk('Riemenspanner Feder','Kaufteil','Federstahl','2.40','Gutekunst','Freigegeben',100,0,'Ø12×35mm','0.014');
+  }
+  /* ── Wasser ── */
+  else if(gid==='wasser'){
+    mk('Einlassventil Gehäuse','Kaufteil','PA66 GF15','8.40','Ceme','Freigegeben',100,0,'100×60×80mm','0.22');
+    mk('Einlassventil Spule 1','Kaufteil','Cu 0.4mm + Ferritkern','4.20','Oswald','Freigegeben',100,0,'Ø36×45mm','0.14');
+    mk('Einlassventil Spule 2','Kaufteil','Cu 0.4mm + Ferritkern','4.20','Oswald','Freigegeben',100,0,'Ø36×45mm','0.14');
+    mk('Einlassventil Filter 1','Kaufteil','PP Sieb 0.3mm','1.20','Ceme','Freigegeben',100,0,'Ø24×15mm','0.008');
+    mk('Einlassventil Filter 2','Kaufteil','PP Sieb 0.3mm','1.20','Ceme','Freigegeben',100,0,'Ø24×15mm','0.008');
+    mk('Einlassventil Stecker','Kaufteil','PA66','0.80','TE Connectivity','Freigegeben',100,0,'30×15×20mm','0.012');
+    [['Zulauf',12],['Ablauf',14],['Druckausgleich',10]].forEach(([label,r])=>{
+      for(let s=1;s<=3;s++) mk(`Schlauch ${label} Seg ${s}`,'Kaufteil',`EPDM Ø${r}mm`,'2.80','Continental ContiTech','Freigegeben',100,0,`Ø${r}×80mm L`,'0.04');
+      mk(`Schlauchschelle ${label} 1`,'Normteil','Stahl verz.','0.40','Norma','Freigegeben',100,0,`Ø${r+4}mm`,'0.008');
+      mk(`Schlauchschelle ${label} 2`,'Normteil','Stahl verz.','0.40','Norma','Freigegeben',100,0,`Ø${r+4}mm`,'0.008');
+    });
+    mk('Druckschalter Körper','Kaufteil','PA66 + Membran','6.80','Mop Aqua','Freigegeben',100,0,'40×40×35mm','0.06');
+    mk('Druckschalter Membran','Kaufteil','EPDM 0.4mm','1.20','Mop Aqua','Freigegeben',100,0,'Ø30×4mm','0.004');
+    mk('Druckschalter Stecker','Kaufteil','PA66','0.60','TE Connectivity','Freigegeben',100,0,'18×12×15mm','0.008');
+    mk('NTC Sensor Körper','Kaufteil','Edelstahl 1.4301','2.80','NXP Semiconductors','Freigegeben',100,0,'Ø10×22mm','0.012');
+    mk('NTC Sensor Dichtung','Kaufteil','EPDM','0.40','Freudenberg','Freigegeben',100,0,'Ø16×4mm','0.003');
+    mk('NTC Sensor Kabel','Kaufteil','Silikonkabel 2×0.5mm','0.80','Lapp','Freigegeben',100,0,'60mm L','0.004');
+    mk('Einspülschale Körper','Eigenteil','PP UV-stabil','6.40','Eigenfertigung Traunreut','Freigegeben',100,0,'160×60×90mm','0.18');
+    mk('Einspülschale Halter','Eigenteil','PP','2.80','Eigenfertigung Traunreut','Freigegeben',100,0,'165×10×95mm','0.08');
+    for(let i=1;i<=3;i++) mk(`Einspüldüse ${i}`,'Kaufteil','POM','1.20','Ceme','Freigegeben',100,0,'Ø12×15mm','0.006');
+    mk('Ablaufpumpe Gehäuse','Kaufteil','PP GF20','12.40','Fluid-o-Tech','Freigegeben',100,0,'Ø90×80mm','0.36');
+    mk('Ablaufpumpe Laufrad','Kaufteil','PP','4.80','Fluid-o-Tech','Freigegeben',100,0,'Ø76×20mm','0.08');
+    mk('Ablaufpumpe Motor','Kaufteil','Synchronmotor 30W','18.60','EBM-Papst','Freigegeben',100,0,'Ø60×55mm','0.42');
+    mk('Ablaufpumpe Einlauf','Kaufteil','PP','2.40','Fluid-o-Tech','Freigegeben',100,0,'Ø28×40mm','0.06');
+    mk('Ablaufpumpe Auslauf','Kaufteil','PP','2.40','Fluid-o-Tech','Freigegeben',100,0,'Ø28×40mm','0.06');
+    mk('Ablaufpumpe Füße','Kaufteil','NBR','1.20','Freudenberg','Freigegeben',100,0,'100×12×70mm','0.04');
+    mk('Ablauffilter Gehäuse','Eigenteil','PP','4.80','Eigenfertigung Traunreut','Freigegeben',100,0,'Ø60×60mm','0.12');
+    mk('Ablauffilter Sieb','Kaufteil','PP Sieb 1.0mm','2.40','Fluid-o-Tech','Freigegeben',100,0,'Ø52×50mm','0.06');
+  }
+  /* ── Heizung ── */
+  else if(gid==='heizung'){
+    mk('Heizelement Flansch','Eigenteil','Edelstahl 1.4301','8.40','Eigenfertigung Traunreut','Freigegeben',100,0,'120×15×60mm','0.42');
+    mk('Heizelement Dichtung','Kaufteil','Silikonflachdichtung','2.80','Freudenberg Sealing','Freigegeben',100,0,'122×4×62mm','0.018');
+    mk('Heizrohr 1 (1600W)','Kaufteil','Edelstahl Rohrheizk. 1.4301','22.40','Türk+Hillinger','Freigegeben',100,0,'Ø16×260mm','0.28');
+    mk('Heizrohr 2 (600W)','Kaufteil','Edelstahl Rohrheizk. 1.4301','12.80','Türk+Hillinger','Freigegeben',100,0,'Ø16×260mm','0.22');
+    mk('Verbindungsbogen','Kaufteil','Edelstahl 1.4301','4.20','Türk+Hillinger','Freigegeben',100,0,'R=15mm Ø16','0.06');
+    mk('Thermosicherung 1 (105°C)','Kaufteil','Thermal Cutout','2.40','Limitor','Freigegeben',100,0,'Ø8×14mm','0.006');
+    mk('Thermosicherung 2 (145°C)','Kaufteil','Thermal Cutout','2.40','Limitor','Freigegeben',100,0,'Ø8×14mm','0.006');
+    mk('Klemme 1 (6.3mm)','Normteil','Messing verz.','0.40','TE Connectivity','Freigegeben',100,0,'12×18×10mm','0.008');
+    mk('Klemme 2 (6.3mm)','Normteil','Messing verz.','0.40','TE Connectivity','Freigegeben',100,0,'12×18×10mm','0.008');
+    mk('Heizelement Abdeckung','Kaufteil','PP GF10','3.20','Rosti','Freigegeben',100,0,'125×8×65mm','0.06');
+    for(let i=1;i<=4;i++) mk(`Befestigungsmutter ${i}`,'Normteil','Messing M5','0.18','Würth','Freigegeben',100,0,'M5','0.004');
+    mk('NTC Temperatursensor','Kaufteil','NTC 10kΩ Edelstahl','2.80','NXP Semiconductors','Freigegeben',100,0,'Ø10×20mm','0.008');
+    mk('NTC Sensor Kabel','Kaufteil','Silikonkabel 2×0.5mm','0.60','Lapp','Freigegeben',100,0,'80mm L','0.005');
+  }
+  /* ── Aufhängung ── */
+  else if(gid==='aufhaengung'){
+    for(let i=1;i<=4;i++){
+      for(let c=1;c<=15;c++) mk(`Feder ${i} Windung ${String(c).padStart(2,'0')}`,'Kaufteil','Federstahl SH','2.80','Gutekunst Federn','Freigegeben',100,0,'Ø36mm Windung','0.06');
+      mk(`Feder ${i} Oberteller`,'Eigenteil','Stahlblech DC01','2.40','Eigenfertigung Traunreut','Freigegeben',100,0,'Ø64×8mm','0.08');
+      mk(`Feder ${i} Untertasse`,'Eigenteil','Stahlblech DC01','2.40','Eigenfertigung Traunreut','Freigegeben',100,0,'Ø64×8mm','0.08');
+      mk(`Feder ${i} Antivibrationspad`,'Kaufteil','NBR 40 Shore','1.80','Freudenberg','Freigegeben',100,0,'Ø70×6mm','0.022');
+      mk(`Feder ${i} Hängeöse`,'Eigenteil','Stahl S235','1.20','Eigenfertigung Traunreut','Freigegeben',100,0,'Ø20×20mm','0.024');
+    }
+    for(let i=1;i<=2;i++){
+      mk(`Dämpfer ${i} Zylinder`,'Kaufteil','Stahl verz.','8.40','Stabilus','Freigegeben',100,0,'Ø36×180mm','0.44');
+      mk(`Dämpfer ${i} Kolbenstange`,'Kaufteil','Stahl verchromt','4.80','Stabilus','Freigegeben',100,0,'Ø18×140mm','0.28');
+      mk(`Dämpfer ${i} Kolben`,'Kaufteil','Stahl + PTFE','2.40','Stabilus','Freigegeben',100,0,'Ø32×20mm','0.08');
+      mk(`Dämpfer ${i} Öldichtung`,'Kaufteil','NBR','1.20','Freudenberg','Freigegeben',100,0,'Ø22×8mm','0.006');
+      mk(`Dämpfer ${i} Öse Unten`,'Kaufteil','Zinkdruckguss','2.80','Stabilus','Freigegeben',100,0,'Ø20×20mm','0.042');
+      mk(`Dämpfer ${i} Öse Oben`,'Kaufteil','Zinkdruckguss','2.80','Stabilus','Freigegeben',100,0,'Ø20×20mm','0.042');
+    }
+  }
+  /* ── Elektronik ── */
+  else if(gid==='elektronik'){
+    mk('Hauptplatine PCB','Kaufteil','FR4 4-lagig HAL-blei','42.60','Jabil Circuit','Freigegeben',100,0,'200×3×280mm','0.12');
+    const compTypes=[['IC','Infineon','8.40'],['Kondensator','Vishay','0.08'],['Widerstand','Yageo','0.02'],['Diode','Vishay','0.06'],['Stecker','TE Connectivity','0.40']];
+    for(let ci=0;ci<150;ci++){const[t,s,c]=compTypes[ci%5];mk(`Hauptplatine ${t} ${String(ci+1).padStart(3,'0')}`,t==='Stecker'?'Kaufteil':'SMD-Bauteil','diverse',c,s,'Freigegeben',100,0,'SMD','0.001');}
+    mk('Motorsteuerung PCB','Kaufteil','FR4 4-lagig','28.40','Jabil Circuit','Freigegeben',100,0,'140×3×180mm','0.08');
+    for(let ci=0;ci<80;ci++){const[t,s,c]=compTypes[ci%5];mk(`Motorst. ${t} ${String(ci+1).padStart(3,'0')}`,t==='Stecker'?'Kaufteil':'SMD-Bauteil','diverse',c,s,'Freigegeben',100,0,'SMD','0.001');}
+    mk('WLAN Modul v4','Kaufteil','FR4 + Keramikantenne','18.90','Infineon Regensburg','In Qualifizierung',88,true,'28×3×22mm','0.006');
+    mk('Bedienpanel PCB','Kaufteil','FR4 2-lagig','14.80','Jabil Circuit','Freigegeben',100,0,'500×3×80mm','0.06');
+    for(let ci=0;ci<60;ci++){const[t,s,c]=compTypes[ci%5];mk(`Bedien ${t} ${String(ci+1).padStart(2,'0')}`,t==='Stecker'?'Kaufteil':'SMD-Bauteil','diverse',c,s,'Freigegeben',100,0,'SMD','0.001');}
+    mk('Display TFT 3.5"','Kaufteil','TFT IPS 320×240','14.40','Raystar Optronics','Freigegeben',100,0,'80×4×56mm','0.042');
+    mk('Display Gehäuse','Kaufteil','ABS','2.40','Rosti','Freigegeben',100,0,'84×12×60mm','0.024');
+    mk('Display Glas Schutz','Kaufteil','Gorilla Glass 0.7mm','4.80','Corning','Freigegeben',100,0,'76×0.7×50mm','0.012');
+    mk('Display Stecker','Kaufteil','FFC 12-pol.','0.40','Molex','Freigegeben',100,0,'12mm Raster 0.5mm','0.002');
+    mk('Display Kabel FFC','Kaufteil','FFC 12-pol. L=60mm','0.80','Molex','Freigegeben',100,0,'60mm','0.003');
+    for(let ki=1;ki<=3;ki++){mk(`Drehregler ${ki} Kappe`,'Kaufteil','ABS','1.20','Rosti','Freigegeben',100,0,'Ø30×8mm','0.008');mk(`Drehregler ${ki} Körper`,'Kaufteil','Encoder+Poti','2.40','Alps Electric','Freigegeben',100,0,'Ø24×14mm','0.012');mk(`Drehregler ${ki} Welle`,'Normteil','Stahl','0.20','Alps Electric','Freigegeben',100,0,'Ø6×10mm','0.002');mk(`Drehregler ${ki} Platine`,'Kaufteil','FR4','1.20','Alps Electric','Freigegeben',100,0,'20×3×20mm','0.004');}
+    for(let bi=1;bi<=8;bi++){mk(`Taste ${bi} Kappe`,'Kaufteil','ABS','0.60','Rosti','Freigegeben',100,0,'18×6×12mm','0.004');mk(`Taste ${bi} Körper`,'Kaufteil','Taktschalter','0.40','Alps Electric','Freigegeben',100,0,'12×10×10mm','0.002');mk(`Taste ${bi} Feder`,'Kaufteil','Federstahl','0.10','Gutekunst','Freigegeben',100,0,'Ø6×6mm','0.001');}
+    for(let ci=1;ci<=20;ci++) mk(`Steckverbinder ${String(ci).padStart(2,'0')}`,'Kaufteil','PA66 + Kontakte Cu','0.40','TE Connectivity','Freigegeben',100,0,'15×12×8mm','0.006');
+  }
+  /* ── Schublade ── */
+  else if(gid==='schublade'){
+    mk('Schublade Gehäuse','Eigenteil','PP UV-stabil','6.40','Eigenfertigung Traunreut','Freigegeben',100,0,'195×80×100mm','0.22');
+    mk('Schublade Körper','Eigenteil','PP','4.80','Eigenfertigung Traunreut','Freigegeben',100,0,'185×70×90mm','0.16');
+    mk('Schublade Griff','Kaufteil','ABS Chrom-optik','3.20','Rosti','Freigegeben',100,0,'185×8×18mm','0.048');
+    mk('Kammer Vorwäsche','Eigenteil','PP','1.20','Eigenfertigung Traunreut','Freigegeben',100,0,'55×65×85mm','0.04');
+    mk('Kammer Hauptwäsche','Eigenteil','PP','1.20','Eigenfertigung Traunreut','Freigegeben',100,0,'55×65×85mm','0.04');
+    mk('Kammer Weichspüler','Eigenteil','PP','1.20','Eigenfertigung Traunreut','Freigegeben',100,0,'55×65×85mm','0.04');
+    mk('Trennwand 1','Eigenteil','PP','0.40','Eigenfertigung Traunreut','Freigegeben',100,0,'3×65×85mm','0.008');
+    mk('Trennwand 2','Eigenteil','PP','0.40','Eigenfertigung Traunreut','Freigegeben',100,0,'3×65×85mm','0.008');
+    mk('Siphon Körper','Kaufteil','PP','2.40','Ceme','Freigegeben',100,0,'Ø24×60mm','0.028');
+    mk('Siphon Heberrohr','Kaufteil','PP','1.20','Ceme','Freigegeben',100,0,'Ø12×55mm','0.012');
+    mk('Siphon Dichtung','Kaufteil','EPDM','0.60','Freudenberg','Freigegeben',100,0,'Ø26×4mm','0.004');
+    mk('Siphon Kappe','Kaufteil','PP','0.80','Ceme','Freigegeben',100,0,'Ø28×8mm','0.008');
+    mk('Siphon Feder','Kaufteil','Federstahl','0.40','Gutekunst','Freigegeben',100,0,'Ø10×40mm','0.006');
+    mk('Führungsschiene Links','Eigenteil','PP GF10','2.40','Eigenfertigung Traunreut','Freigegeben',100,0,'6×80×95mm','0.024');
+    mk('Führungsschiene Rechts','Eigenteil','PP GF10','2.40','Eigenfertigung Traunreut','Freigegeben',100,0,'6×80×95mm','0.024');
+    mk('Wasserverteiler','Eigenteil','PP','3.20','Eigenfertigung Traunreut','Freigegeben',100,0,'180×10×15mm','0.028');
+    for(let i=1;i<=3;i++) mk(`Einspüldüse ${i}`,'Kaufteil','POM','0.60','Ceme','Freigegeben',100,0,'Ø8×15mm','0.004');
+    for(let i=1;i<=8;i++) mk(`Schraube M3×12 ${i}`,'Normteil','Stahl A2','0.04','Würth','Freigegeben',100,0,'M3×12mm','0.002');
+    for(let i=1;i<=5;i++) mk(`Schnappclip ${i}`,'Kaufteil','PA66','0.10','Richco','Freigegeben',100,0,'8×5×8mm','0.002');
+  }
+  /* ── Kabelbaum ── */
+  else if(gid==='kabelbaum'){
+    for(let i=1;i<=20;i++) mk(`Kabel Hauptstamm Seg ${String(i).padStart(2,'0')}`,'Kaufteil','PVC 8×0.75mm','2.80','Lapp Kabel','Freigegeben',100,0,'50mm L','0.02');
+    [['Motor',8],['Pumpe',8],['Heizung',8],['Einlassventil',8],['Türschloss',6],['Sensoren',10]].forEach(([b,c])=>{for(let i=1;i<=c;i++) mk(`Kabel ${b} Seg ${String(i).padStart(2,'0')}`,'Kaufteil','PVC 2×0.75mm','0.80','Lapp Kabel','Freigegeben',100,0,'40mm L','0.004');});
+    for(let i=1;i<=100;i++) mk(`Kabelbinder ${String(i).padStart(3,'0')}`,'Normteil','PA66 natur','0.06','Hellermann Tyton','Freigegeben',100,0,'200×3.5mm','0.002');
+    for(let i=1;i<=80;i++) mk(`Kabelclip ${String(i).padStart(2,'0')}`,'Kaufteil','PA66','0.08','Richco','Freigegeben',100,0,'12×6×8mm','0.003');
+    for(let i=1;i<=30;i++) mk(`Steckergehäuse ${String(i).padStart(2,'0')}`,'Kaufteil','PA66 + Cu-Kontakte','0.40','TE Connectivity','Freigegeben',100,0,'18×12×12mm','0.008');
+    for(let i=1;i<=150;i++) mk(`Steckerpin ${String(i).padStart(3,'0')}`,'Kaufteil','Cu Sn6 vergoldet','0.06','TE Connectivity','Freigegeben',100,0,'Ø1.0×8mm','0.0005');
+    for(let i=1;i<=50;i++) mk(`Schrumpfschlauch ${String(i).padStart(2,'0')}`,'Kaufteil','PE 2:1','0.04','Hellermann Tyton','Freigegeben',100,0,'Ø8×20mm','0.001');
+    for(let i=1;i<=10;i++) mk(`Massepunkt ${i}`,'Kaufteil','Messing M4','0.40','Würth','Freigegeben',100,0,'Ø12×4mm','0.006');
+  }
+  /* ── Befestigung ── */
+  else if(gid==='befestigung'){
+    const specs=[
+      ['M3 Schraube DIN 933 A2',1000,'Stahl A2-70','0.04','Würth','M3×10mm','0.0012'],
+      ['M4 Schraube DIN 933 A2',1500,'Stahl A2-70','0.06','Würth','M4×14mm','0.0028'],
+      ['M5 Schraube DIN 933 A2-70',1000,'Stahl A2-70','0.09','Würth','M5×18mm','0.0054'],
+      ['M6 Schraube DIN 931 A2-70',800,'Stahl A2-70','0.12','Würth','M6×22mm','0.0090'],
+      ['M8 Bolzen DIN 931 8.8',500,'Stahl 8.8 verz.','0.18','Häfele','M8×30mm','0.020'],
+      ['M10 Bolzen DIN 931 8.8',200,'Stahl 8.8 verz.','0.28','Häfele','M10×40mm','0.040'],
+      ['M4 Mutter DIN 934 A2',1500,'Stahl A2','0.03','Würth','M4','0.0018'],
+      ['M6 Mutter DIN 934 A2',600,'Stahl A2','0.05','Würth','M6','0.0040'],
+      ['M8 Mutter DIN 934 8.8',500,'Stahl 8.8','0.07','Häfele','M8','0.0075'],
+      ['M4 Unterlegscheibe DIN 125',500,'Stahl A2','0.02','Würth','Ø9×1.5mm','0.0012'],
+      ['M6 Unterlegscheibe DIN 125',200,'Stahl A2','0.03','Würth','Ø12×2mm','0.0028'],
+      ['M4 Federring DIN 127',300,'Federstahl A2','0.03','Würth','Ø4mm','0.0008'],
+      ['M6 Federring DIN 127',200,'Federstahl A2','0.04','Würth','Ø6mm','0.0018'],
+      ['Kunststoffclip PA66',300,'PA66 schwarz','0.08','Richco','10×6×10mm','0.0030'],
+      ['Blindniet Ø3.2×8 Al',212,'Aluminium EN-AW 5052','0.05','Gesipa','Ø3.2×8mm','0.0008'],
+    ];
+    specs.forEach(([nm,cnt,mat,cost,sup,dims,wt])=>{for(let i=1;i<=cnt;i++) mk(`${nm} ${String(i).padStart(cnt>=1000?4:3,'0')}`,'Normteil',mat,cost,sup,'Freigegeben',100,0,dims,wt);});
+  }
+  return parts;
+}
+
+/* ─── Digital Twin View ──────────────────────────────────────────────────── */
 function DigitalTwinView({project,addLog}){
   const product=PRODUCTS[0];
   const canvasRef=useRef(null);
   const ovContRef=useRef(null);
   const ovInstanceRef=useRef(null);
   const fileInputRef=useRef(null);
-  const [selPart,setSelPart]=useState(null);
   const [cadFile,setCadFile]=useState(null);
+  const [selGrp,setSelGrp]=useState(null);
+  const [selPart,setSelPart]=useState(null);
+  const [search,setSearch]=useState('');
+  const [page,setPage]=useState(0);
+  const PAGE=50;
+
+  const grpParts=useMemo(()=>selGrp?buildGroupParts(selGrp):[],[selGrp]);
+  const filtered=useMemo(()=>{if(!search.trim())return grpParts;const q=search.toLowerCase();return grpParts.filter(p=>p.name.toLowerCase().includes(q)||p.id.toLowerCase().includes(q));},[grpParts,search]);
+  const pageItems=filtered.slice(page*PAGE,(page+1)*PAGE);
+  const pages=Math.ceil(filtered.length/PAGE);
+
+  const partDetail=useMemo(()=>selPart?grpParts.find(p=>p.id===selPart):null,[selPart,grpParts]);
+
+  useEffect(()=>{setPage(0);setSelPart(null);},[selGrp,search]);
 
   useEffect(()=>{
     if(!cadFile||!ovContRef.current)return;
     const OV=window.OV;
-    if(!OV){alert('Online3DViewer konnte nicht geladen werden. Bitte Internetverbindung prüfen.');return;}
-    if(ovInstanceRef.current&&ovInstanceRef.current.Destroy){
-      ovInstanceRef.current.Destroy(); ovInstanceRef.current=null;
-    }
+    if(!OV){alert('Online3DViewer nicht geladen.');return;}
+    if(ovInstanceRef.current&&ovInstanceRef.current.Destroy){ovInstanceRef.current.Destroy();ovInstanceRef.current=null;}
     const viewer=new OV.EmbedViewer(ovContRef.current);
     viewer.LoadModelFromFileList([cadFile]);
     ovInstanceRef.current=viewer;
-    return()=>{
-      if(ovInstanceRef.current&&ovInstanceRef.current.Destroy){
-        ovInstanceRef.current.Destroy(); ovInstanceRef.current=null;
-      }
-    };
+    return()=>{if(ovInstanceRef.current&&ovInstanceRef.current.Destroy){ovInstanceRef.current.Destroy();ovInstanceRef.current=null;}};
   },[cadFile]);
 
-  function handleFileChange(e){
-    const f=e.target.files&&e.target.files[0];
-    if(f)setCadFile(f);
-    e.target.value='';
-  }
-  function resetViewer(){
-    if(ovInstanceRef.current&&ovInstanceRef.current.Destroy){ovInstanceRef.current.Destroy();ovInstanceRef.current=null;}
-    setCadFile(null);
-  }
+  function handleFileChange(e){const f=e.target.files&&e.target.files[0];if(f)setCadFile(f);e.target.value='';}
+  function resetViewer(){if(ovInstanceRef.current&&ovInstanceRef.current.Destroy){ovInstanceRef.current.Destroy();ovInstanceRef.current=null;}setCadFile(null);}
+
+  const curMeta=PART_GROUPS_META.find(g=>g.id===selGrp);
+  const stageCol={'Freigegeben':'#34d399','In Qualifizierung':'#fbbf24','Bemusterung':'#60a5fa','In Entwicklung':'#f87171','Konzept':'#94a3b8'};
 
   return(
   <GenericView title="Digital Twin · 3D" subtitle={product.brand+' '+product.name+' · '+product.release} icon="cpu" systems={['sys_tc','sys_sap','sys_nex']}>
-    <div style={{display:'flex',gap:14,height:'100%',minHeight:380}}>
-      {/* ── 3D Viewer ── */}
-      <div className="gc" style={{flex:'0 0 54%',position:'relative',background:'#03050a',borderRadius:14,overflow:'hidden',minHeight:360}}>
-        {/* Procedural washing machine (hidden when CAD file loaded) */}
+    {/* Stats bar */}
+    <div style={{display:'flex',gap:8,marginBottom:10,flexWrap:'wrap'}}>
+      {[
+        [`${TOTAL_PARTS.toLocaleString('de')} Bauteile`,'cpu','#60a5fa'],
+        [`${TOTAL_COST.toFixed(0)} EUR gesamt`,'euro','#fbbf24'],
+        [`${PART_GROUPS_META.length} Baugruppen`,'layers','#34d399'],
+        [product.devStatus,'check-circle','#4ade80'],
+      ].map(([v,icon,col])=>(
+        <div key={v} style={{display:'flex',alignItems:'center',gap:5,background:'rgba(15,23,42,.7)',border:`1px solid ${col}22`,borderRadius:7,padding:'4px 10px',flex:'1 0 auto'}}>
+          <i data-lucide={icon} style={{width:11,height:11,color:col}}></i>
+          <span style={{fontSize:10,fontWeight:700,color:col}}>{v}</span>
+        </div>
+      ))}
+    </div>
+    <div style={{display:'flex',gap:10,height:'calc(100% - 40px)',minHeight:380}}>
+
+      {/* ── Baugruppen-Baum (links) ── */}
+      <div style={{flex:'0 0 22%',display:'flex',flexDirection:'column',gap:0,minWidth:0}}>
+        <div style={{fontSize:8,fontWeight:900,color:C.sub,textTransform:'uppercase',letterSpacing:1,padding:'0 0 6px 2px'}}>Baugruppen-Baum</div>
+        <div className="sb" style={{overflowY:'auto',flex:1}}>
+          {PART_GROUPS_META.map(g=>(
+            <div key={g.id}>
+              <div onClick={()=>{setSelGrp(selGrp===g.id?null:g.id);setSearch('');}}
+                style={{display:'flex',alignItems:'center',gap:6,padding:'7px 8px',borderRadius:7,cursor:'pointer',marginBottom:2,
+                  background:selGrp===g.id?`${g.col}18`:'rgba(15,23,42,.4)',
+                  border:`1px solid ${selGrp===g.id?g.col+'44':'#1e293b'}`,
+                  transition:'all .12s'}}>
+                <div style={{width:8,height:8,borderRadius:2,background:g.col,flexShrink:0}}/>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontSize:10,fontWeight:700,color:selGrp===g.id?g.col:C.tx,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{g.name}</div>
+                  <div style={{fontSize:8,color:C.sub}}>{g.count.toLocaleString('de')} Teile · {g.totalCost.toFixed(0)} EUR</div>
+                </div>
+                <div style={{fontSize:9,color:selGrp===g.id?g.col:C.sub}}>{selGrp===g.id?'▾':'▸'}</div>
+              </div>
+              {/* Parts list for selected group */}
+              {selGrp===g.id&&<div style={{marginBottom:6,paddingLeft:4}}>
+                <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Suche Teil..." style={{width:'100%',background:'#020408',border:'1px solid #1e293b',color:C.tx,fontSize:9,borderRadius:5,padding:'4px 7px',outline:'none',marginBottom:4}}/>
+                <div style={{fontSize:8,color:C.sub,marginBottom:3,padding:'0 2px'}}>{filtered.length.toLocaleString('de')} Treffer{pages>1?` · Seite ${page+1}/${pages}`:''}</div>
+                <div className="sb" style={{maxHeight:200,overflowY:'auto'}}>
+                  {pageItems.map(p=>(
+                    <div key={p.id} onClick={()=>setSelPart(selPart===p.id?null:p.id)}
+                      style={{padding:'4px 6px',borderRadius:5,cursor:'pointer',marginBottom:1,
+                        background:selPart===p.id?`${g.col}20`:'rgba(5,8,15,.6)',
+                        border:`1px solid ${selPart===p.id?g.col+'55':'transparent'}`,
+                        transition:'all .1s'}}>
+                      <div style={{fontSize:9,fontWeight:600,color:selPart===p.id?g.col:C.tx,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{p.name}</div>
+                      <div style={{fontSize:7,color:C.sub,fontFamily:'monospace'}}>{p.id}</div>
+                    </div>
+                  ))}
+                </div>
+                {pages>1&&<div style={{display:'flex',gap:4,marginTop:4}}>
+                  <button disabled={page===0} onClick={()=>setPage(p=>p-1)} style={{flex:1,padding:'3px 0',fontSize:9,background:'rgba(30,41,59,.8)',border:'1px solid #1e293b',color:C.sub,borderRadius:4,cursor:page===0?'not-allowed':'pointer'}}>◀</button>
+                  <button disabled={page>=pages-1} onClick={()=>setPage(p=>p+1)} style={{flex:1,padding:'3px 0',fontSize:9,background:'rgba(30,41,59,.8)',border:'1px solid #1e293b',color:C.sub,borderRadius:4,cursor:page>=pages-1?'not-allowed':'pointer'}}>▶</button>
+                </div>}
+              </div>}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── 3D Viewer (mitte) ── */}
+      <div className="gc" style={{flex:'0 0 48%',position:'relative',background:'#03050a',borderRadius:14,overflow:'hidden',minHeight:320}}>
         <canvas ref={canvasRef} style={{display:cadFile?'none':'block',width:'100%',height:'100%',position:'absolute',inset:0}}/>
         {!cadFile&&<WashingMachine3D canvasRef={canvasRef}/>}
-        {/* Online3DViewer container for real STEP/STL/OBJ files */}
         <div ref={ovContRef} style={{display:cadFile?'block':'none',width:'100%',height:'100%',position:'absolute',inset:0}}/>
-        {/* Overlay: default state */}
         {!cadFile&&<>
-          <div style={{position:'absolute',top:10,left:12,pointerEvents:'none'}}>
-            <div style={{fontSize:8,fontWeight:900,color:'#334155',textTransform:'uppercase',letterSpacing:1.5}}>Live 3D · Orbit mit Maus</div>
+          <div style={{position:'absolute',top:8,left:10,pointerEvents:'none'}}>
+            <div style={{fontSize:7,fontWeight:900,color:'#334155',textTransform:'uppercase',letterSpacing:1.5}}>Live 3D · Orbit mit Maus</div>
           </div>
-          <div style={{position:'absolute',bottom:46,left:12,display:'flex',gap:8,pointerEvents:'none'}}>
+          <div style={{position:'absolute',bottom:42,left:10,display:'flex',gap:6,pointerEvents:'none'}}>
             {[['Kapazität',product.specs.capacity],['Drehzahl',product.specs.rpm],['Energie',product.specs.energy]].map(([k,v])=>(
-              <div key={k} style={{background:'rgba(5,8,15,.7)',border:'1px solid #1e293b',borderRadius:7,padding:'4px 9px'}}>
-                <div style={{fontSize:8,color:'#475569',textTransform:'uppercase'}}>{k}</div>
-                <div style={{fontSize:11,fontWeight:800,color:'#e2e8f0'}}>{v}</div>
+              <div key={k} style={{background:'rgba(5,8,15,.7)',border:'1px solid #1e293b',borderRadius:6,padding:'3px 7px'}}>
+                <div style={{fontSize:7,color:'#475569',textTransform:'uppercase'}}>{k}</div>
+                <div style={{fontSize:10,fontWeight:800,color:'#e2e8f0'}}>{v}</div>
               </div>
             ))}
           </div>
         </>}
-        {/* Overlay: CAD file loaded */}
-        {cadFile&&<div style={{position:'absolute',top:10,left:12,background:'rgba(5,8,15,.8)',border:'1px solid #1e3a5f',borderRadius:7,padding:'4px 10px',pointerEvents:'none'}}>
-          <div style={{fontSize:9,color:'#60a5fa',fontWeight:700}}>📐 {cadFile.name}</div>
-          <div style={{fontSize:8,color:'#475569',marginTop:1}}>Drehen · Zoomen · Verschieben</div>
+        {cadFile&&<div style={{position:'absolute',top:8,left:10,background:'rgba(5,8,15,.85)',border:'1px solid #1e3a5f',borderRadius:6,padding:'3px 8px',pointerEvents:'none'}}>
+          <div style={{fontSize:8,color:'#60a5fa',fontWeight:700}}>📐 {cadFile.name}</div>
         </div>}
-        {/* Status badge */}
-        <div style={{position:'absolute',top:10,right:12,background:'rgba(16,185,129,.12)',border:'1px solid rgba(16,185,129,.3)',borderRadius:6,padding:'3px 9px',fontSize:9,fontWeight:800,color:'#34d399',pointerEvents:'none'}}>{product.devStatus}</div>
-        {/* Bottom toolbar */}
-        <div style={{position:'absolute',bottom:10,right:10,display:'flex',gap:6,alignItems:'center'}}>
-          {cadFile&&<button onClick={resetViewer} style={{padding:'5px 11px',background:'rgba(15,23,42,.9)',border:'1px solid #334155',borderRadius:6,color:'#94a3b8',fontSize:10,fontWeight:700,cursor:'pointer',backdropFilter:'blur(6px)'}}>← Waschmaschine</button>}
+        {selGrp&&!cadFile&&<div style={{position:'absolute',top:8,left:'50%',transform:'translateX(-50%)',background:`${curMeta.col}22`,border:`1px solid ${curMeta.col}44`,borderRadius:6,padding:'3px 9px',pointerEvents:'none'}}>
+          <div style={{fontSize:8,fontWeight:800,color:curMeta.col}}>{curMeta.name} · {curMeta.count.toLocaleString('de')} Teile</div>
+        </div>}
+        <div style={{position:'absolute',top:8,right:10,background:'rgba(16,185,129,.12)',border:'1px solid rgba(16,185,129,.3)',borderRadius:5,padding:'2px 7px',fontSize:8,fontWeight:800,color:'#34d399',pointerEvents:'none'}}>{product.devStatus}</div>
+        <div style={{position:'absolute',bottom:8,right:8,display:'flex',gap:5,alignItems:'center'}}>
+          {cadFile&&<button onClick={resetViewer} style={{padding:'4px 9px',background:'rgba(15,23,42,.9)',border:'1px solid #334155',borderRadius:5,color:'#94a3b8',fontSize:9,fontWeight:700,cursor:'pointer'}}>← 3D Modell</button>}
           <button onClick={()=>fileInputRef.current&&fileInputRef.current.click()}
-            style={{padding:'5px 13px',background:'rgba(59,130,246,.18)',border:'1px solid rgba(59,130,246,.45)',borderRadius:6,color:'#60a5fa',fontSize:10,fontWeight:700,cursor:'pointer',backdropFilter:'blur(6px)'}}>
-            📂 STEP / STL laden
+            style={{padding:'4px 10px',background:'rgba(59,130,246,.18)',border:'1px solid rgba(59,130,246,.45)',borderRadius:5,color:'#60a5fa',fontSize:9,fontWeight:700,cursor:'pointer'}}>
+            📂 STEP / STL
           </button>
           <input ref={fileInputRef} type="file" accept=".step,.stp,.stl,.igs,.iges,.obj" style={{display:'none'}} onChange={handleFileChange}/>
         </div>
       </div>
-      {/* ── BOM Panel ── */}
-      <div style={{flex:1,display:'flex',flexDirection:'column',gap:6,overflowY:'auto'}} className="sb">
-        <div style={{fontSize:9,fontWeight:900,color:C.sub,textTransform:'uppercase',letterSpacing:1,marginBottom:4}}>Stückliste · {product.bom.length} Bauteile</div>
-        {product.bom.map(b=>(
-          <div key={b.id} onClick={()=>setSelPart(selPart===b.id?null:b.id)}
-            className="gc" style={{padding:'10px 12px',borderLeft:'3px solid '+(b.risk?'#f59e0b':'#3b82f6'),cursor:'pointer',
-              background:selPart===b.id?'rgba(59,130,246,.1)':'',transition:'all .15s'}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-              <span style={{fontSize:11,fontWeight:700,color:C.tx}}>{b.name}</span>
-              <span style={{fontSize:11,fontWeight:800,color:'#fbbf24'}}>{b.cost}</span>
+
+      {/* ── Attribut-Panel (rechts) ── */}
+      <div style={{flex:1,display:'flex',flexDirection:'column',gap:6,minWidth:0}}>
+        {partDetail?(
+          <>
+            <div style={{fontSize:8,fontWeight:900,color:C.sub,textTransform:'uppercase',letterSpacing:1}}>Bauteil-Attribut</div>
+            <div className="gc" style={{padding:'12px 14px',borderLeft:`3px solid ${curMeta?.col||'#3b82f6'}`}}>
+              <div style={{fontSize:12,fontWeight:800,color:C.tx,marginBottom:2,wordBreak:'break-word'}}>{partDetail.name}</div>
+              <div style={{fontFamily:'monospace',fontSize:9,color:curMeta?.col||'#60a5fa',marginBottom:10}}>{partDetail.id}</div>
+              {[
+                ['Typ',partDetail.type],['Material',partDetail.mat],
+                ['Abmaße',partDetail.dims],['Gewicht',partDetail.wt],
+                ['Kosten',partDetail.cost],['Lieferant',partDetail.sup],
+                ['Stadium',partDetail.stage],
+              ].map(([k,v])=>(
+                <div key={k} style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',padding:'4px 0',borderBottom:'1px solid #0f172a',gap:8}}>
+                  <span style={{fontSize:9,color:C.sub,flexShrink:0}}>{k}</span>
+                  <span style={{fontSize:9,fontWeight:600,color:k==='Stadium'?(stageCol[v]||C.tx):k==='Kosten'?'#fbbf24':C.tx,textAlign:'right',wordBreak:'break-word'}}>{v}</span>
+                </div>
+              ))}
+              <div style={{marginTop:8}}>
+                <div style={{display:'flex',justifyContent:'space-between',fontSize:8,marginBottom:3}}>
+                  <span style={{color:C.sub}}>Freigabefortschritt</span>
+                  <span style={{color:partDetail.prog===100?'#34d399':'#fbbf24',fontWeight:700}}>{partDetail.prog}%</span>
+                </div>
+                <div style={{height:4,background:'#0f172a',borderRadius:2}}>
+                  <div style={{height:'100%',width:partDetail.prog+'%',background:partDetail.risk?'linear-gradient(90deg,#f59e0b,#fbbf24)':partDetail.prog===100?'linear-gradient(90deg,#22c55e,#4ade80)':'linear-gradient(90deg,#3b82f6,#60a5fa)',borderRadius:2,transition:'width .3s'}}/>
+                </div>
+                {partDetail.risk&&<div style={{fontSize:8,marginTop:6,color:'#f59e0b',background:'rgba(245,158,11,.08)',border:'1px solid rgba(245,158,11,.25)',borderRadius:4,padding:'3px 8px'}}>⚠ Single-Source-Risiko · Alternativlieferant prüfen</div>}
+              </div>
             </div>
-            <div style={{fontSize:9,color:C.sub,marginTop:1}}>{b.supplier}</div>
-            <div style={{height:3,background:'#0f172a',borderRadius:2,marginTop:7}}>
-              <div style={{height:'100%',width:b.progress+'%',background:b.risk?'linear-gradient(90deg,#f59e0b,#fbbf24)':'linear-gradient(90deg,#3b82f6,#60a5fa)',borderRadius:2}}/>
+          </>
+        ):(
+          <>
+            <div style={{fontSize:8,fontWeight:900,color:C.sub,textTransform:'uppercase',letterSpacing:1}}>Stückliste Übersicht</div>
+            <div className="sb" style={{flex:1,overflowY:'auto',display:'flex',flexDirection:'column',gap:4}}>
+              {PART_GROUPS_META.map(g=>(
+                <div key={g.id} className="gc" style={{padding:'8px 10px',borderLeft:`3px solid ${g.col}`,cursor:'pointer'}} onClick={()=>setSelGrp(g.id)}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                    <span style={{fontSize:10,fontWeight:700,color:C.tx}}>{g.name}</span>
+                    <span style={{fontSize:10,fontWeight:800,color:'#fbbf24'}}>{g.totalCost.toFixed(0)} EUR</span>
+                  </div>
+                  <div style={{height:3,background:'#0f172a',borderRadius:2,marginTop:5}}>
+                    <div style={{height:'100%',width:(g.count/TOTAL_PARTS*100)+'%',background:`linear-gradient(90deg,${g.col}aa,${g.col})`,borderRadius:2}}/>
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between',marginTop:3}}>
+                    <span style={{fontSize:7,color:C.sub}}>{g.count.toLocaleString('de')} Teile</span>
+                    <span style={{fontSize:7,color:g.col}}>{(g.count/TOTAL_PARTS*100).toFixed(1)}%</span>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div style={{display:'flex',justifyContent:'space-between',marginTop:3}}>
-              <span style={{fontSize:8,color:b.risk?'#f59e0b':C.sub}}>{b.stage}</span>
-              <span style={{fontSize:8,color:C.sub}}>{b.progress}%</span>
-            </div>
-            {b.risk&&<div style={{fontSize:8,marginTop:4,color:'#f59e0b',background:'rgba(245,158,11,.08)',border:'1px solid rgba(245,158,11,.2)',borderRadius:4,padding:'2px 7px',display:'inline-block'}}>⚠ Single-Source-Risiko</div>}
-          </div>
-        ))}
+          </>
+        )}
       </div>
     </div>
   </GenericView>
