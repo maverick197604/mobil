@@ -15,6 +15,7 @@
 <script src="https://unpkg.com/lucide@0.544.0/dist/umd/lucide.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/online-3d-viewer@0.12.0/build/engine/o3dv.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
@@ -1391,29 +1392,79 @@ function WashingMachine3D({canvasRef}){
 function DigitalTwinView({project,addLog}){
   const product=PRODUCTS[0];
   const canvasRef=useRef(null);
+  const ovContRef=useRef(null);
+  const ovInstanceRef=useRef(null);
+  const fileInputRef=useRef(null);
   const [selPart,setSelPart]=useState(null);
-  const sp=selPart?product.bom.find(b=>b.id===selPart):null;
+  const [cadFile,setCadFile]=useState(null);
+
+  useEffect(()=>{
+    if(!cadFile||!ovContRef.current)return;
+    const OV=window.OV;
+    if(!OV){alert('Online3DViewer konnte nicht geladen werden. Bitte Internetverbindung prüfen.');return;}
+    if(ovInstanceRef.current&&ovInstanceRef.current.Destroy){
+      ovInstanceRef.current.Destroy(); ovInstanceRef.current=null;
+    }
+    const viewer=new OV.EmbedViewer(ovContRef.current);
+    viewer.LoadModelFromFileList([cadFile]);
+    ovInstanceRef.current=viewer;
+    return()=>{
+      if(ovInstanceRef.current&&ovInstanceRef.current.Destroy){
+        ovInstanceRef.current.Destroy(); ovInstanceRef.current=null;
+      }
+    };
+  },[cadFile]);
+
+  function handleFileChange(e){
+    const f=e.target.files&&e.target.files[0];
+    if(f)setCadFile(f);
+    e.target.value='';
+  }
+  function resetViewer(){
+    if(ovInstanceRef.current&&ovInstanceRef.current.Destroy){ovInstanceRef.current.Destroy();ovInstanceRef.current=null;}
+    setCadFile(null);
+  }
+
   return(
   <GenericView title="Digital Twin · 3D" subtitle={product.brand+' '+product.name+' · '+product.release} icon="cpu" systems={['sys_tc','sys_sap','sys_nex']}>
     <div style={{display:'flex',gap:14,height:'100%',minHeight:380}}>
       {/* ── 3D Viewer ── */}
       <div className="gc" style={{flex:'0 0 54%',position:'relative',background:'#03050a',borderRadius:14,overflow:'hidden',minHeight:360}}>
-        <canvas ref={canvasRef} style={{display:'block',width:'100%',height:'100%',position:'absolute',inset:0}}/>
-        <WashingMachine3D canvasRef={canvasRef}/>
-        {/* Overlay labels */}
-        <div style={{position:'absolute',top:10,left:12,pointerEvents:'none'}}>
-          <div style={{fontSize:8,fontWeight:900,color:'#334155',textTransform:'uppercase',letterSpacing:1.5}}>Live 3D · Orbit mit Maus</div>
-        </div>
-        <div style={{position:'absolute',bottom:10,left:12,display:'flex',gap:8,pointerEvents:'none'}}>
-          {[['Kapazität',product.specs.capacity],['Drehzahl',product.specs.rpm],['Energie',product.specs.energy]].map(([k,v])=>(
-            <div key={k} style={{background:'rgba(5,8,15,.7)',border:'1px solid #1e293b',borderRadius:7,padding:'4px 9px'}}>
-              <div style={{fontSize:8,color:'#475569',textTransform:'uppercase'}}>{k}</div>
-              <div style={{fontSize:11,fontWeight:800,color:'#e2e8f0'}}>{v}</div>
-            </div>
-          ))}
-        </div>
+        {/* Procedural washing machine (hidden when CAD file loaded) */}
+        <canvas ref={canvasRef} style={{display:cadFile?'none':'block',width:'100%',height:'100%',position:'absolute',inset:0}}/>
+        {!cadFile&&<WashingMachine3D canvasRef={canvasRef}/>}
+        {/* Online3DViewer container for real STEP/STL/OBJ files */}
+        <div ref={ovContRef} style={{display:cadFile?'block':'none',width:'100%',height:'100%',position:'absolute',inset:0}}/>
+        {/* Overlay: default state */}
+        {!cadFile&&<>
+          <div style={{position:'absolute',top:10,left:12,pointerEvents:'none'}}>
+            <div style={{fontSize:8,fontWeight:900,color:'#334155',textTransform:'uppercase',letterSpacing:1.5}}>Live 3D · Orbit mit Maus</div>
+          </div>
+          <div style={{position:'absolute',bottom:46,left:12,display:'flex',gap:8,pointerEvents:'none'}}>
+            {[['Kapazität',product.specs.capacity],['Drehzahl',product.specs.rpm],['Energie',product.specs.energy]].map(([k,v])=>(
+              <div key={k} style={{background:'rgba(5,8,15,.7)',border:'1px solid #1e293b',borderRadius:7,padding:'4px 9px'}}>
+                <div style={{fontSize:8,color:'#475569',textTransform:'uppercase'}}>{k}</div>
+                <div style={{fontSize:11,fontWeight:800,color:'#e2e8f0'}}>{v}</div>
+              </div>
+            ))}
+          </div>
+        </>}
+        {/* Overlay: CAD file loaded */}
+        {cadFile&&<div style={{position:'absolute',top:10,left:12,background:'rgba(5,8,15,.8)',border:'1px solid #1e3a5f',borderRadius:7,padding:'4px 10px',pointerEvents:'none'}}>
+          <div style={{fontSize:9,color:'#60a5fa',fontWeight:700}}>📐 {cadFile.name}</div>
+          <div style={{fontSize:8,color:'#475569',marginTop:1}}>Drehen · Zoomen · Verschieben</div>
+        </div>}
         {/* Status badge */}
         <div style={{position:'absolute',top:10,right:12,background:'rgba(16,185,129,.12)',border:'1px solid rgba(16,185,129,.3)',borderRadius:6,padding:'3px 9px',fontSize:9,fontWeight:800,color:'#34d399',pointerEvents:'none'}}>{product.devStatus}</div>
+        {/* Bottom toolbar */}
+        <div style={{position:'absolute',bottom:10,right:10,display:'flex',gap:6,alignItems:'center'}}>
+          {cadFile&&<button onClick={resetViewer} style={{padding:'5px 11px',background:'rgba(15,23,42,.9)',border:'1px solid #334155',borderRadius:6,color:'#94a3b8',fontSize:10,fontWeight:700,cursor:'pointer',backdropFilter:'blur(6px)'}}>← Waschmaschine</button>}
+          <button onClick={()=>fileInputRef.current&&fileInputRef.current.click()}
+            style={{padding:'5px 13px',background:'rgba(59,130,246,.18)',border:'1px solid rgba(59,130,246,.45)',borderRadius:6,color:'#60a5fa',fontSize:10,fontWeight:700,cursor:'pointer',backdropFilter:'blur(6px)'}}>
+            📂 STEP / STL laden
+          </button>
+          <input ref={fileInputRef} type="file" accept=".step,.stp,.stl,.igs,.iges,.obj" style={{display:'none'}} onChange={handleFileChange}/>
+        </div>
       </div>
       {/* ── BOM Panel ── */}
       <div style={{flex:1,display:'flex',flexDirection:'column',gap:6,overflowY:'auto'}} className="sb">
