@@ -1804,7 +1804,7 @@ function DigitalTwinView({project,addLog}){
         [`${PART_GROUPS_META.length} Baugruppen`,'layers','#34d399'],
         [product.devStatus,'check-circle','#4ade80'],
       ].map(([v,icon,col])=>(
-        <div key={v} style={{display:'flex',alignItems:'center',gap:5,background:'rgba(15,23,42,.7)',border:`1px solid ${col}22`,borderRadius:7,padding:'4px 10px',flex:'1 0 auto'}}>
+        <div key={v} style={{display:'flex',alignItems:'center',gap:5,background:'rgba(248,250,252,.9)',border:`1px solid ${col}44`,borderRadius:7,padding:'4px 10px',flex:'1 0 auto'}}>
           <i data-lucide={icon} style={{width:11,height:11,color:col}}></i>
           <span style={{fontSize:10,fontWeight:700,color:col}}>{v}</span>
         </div>
@@ -1820,8 +1820,8 @@ function DigitalTwinView({project,addLog}){
             <div key={g.id}>
               <div onClick={()=>{setSelGrp(selGrp===g.id?null:g.id);setSearch('');}}
                 style={{display:'flex',alignItems:'center',gap:6,padding:'7px 8px',borderRadius:7,cursor:'pointer',marginBottom:2,
-                  background:selGrp===g.id?`${g.col}18`:'rgba(15,23,42,.4)',
-                  border:`1px solid ${selGrp===g.id?g.col+'44':'#1e293b'}`,
+                  background:selGrp===g.id?`${g.col}18`:'rgba(241,245,249,.8)',
+                  border:`1px solid ${selGrp===g.id?g.col+'44':'#e2e8f0'}`,
                   transition:'all .12s'}}>
                 <div style={{width:8,height:8,borderRadius:2,background:g.col,flexShrink:0}}/>
                 <div style={{flex:1,minWidth:0}}>
@@ -1832,14 +1832,14 @@ function DigitalTwinView({project,addLog}){
               </div>
               {/* Parts list for selected group */}
               {selGrp===g.id&&<div style={{marginBottom:6,paddingLeft:4}}>
-                <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Suche Teil..." style={{width:'100%',background:'#020408',border:'1px solid #1e293b',color:C.tx,fontSize:9,borderRadius:5,padding:'4px 7px',outline:'none',marginBottom:4}}/>
+                <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Suche Teil..." style={{width:'100%',background:'#f8fafc',border:'1px solid #cbd5e1',color:C.tx,fontSize:9,borderRadius:5,padding:'4px 7px',outline:'none',marginBottom:4}}/>
                 <div style={{fontSize:8,color:C.sub,marginBottom:3,padding:'0 2px'}}>{filtered.length.toLocaleString('de')} Treffer{pages>1?` · Seite ${page+1}/${pages}`:''}</div>
                 <div className="sb" style={{maxHeight:200,overflowY:'auto'}}>
                   {pageItems.map(p=>(
                     <div key={p.id} onClick={()=>setSelPart(selPart===p.id?null:p.id)}
                       style={{padding:'4px 6px',borderRadius:5,cursor:'pointer',marginBottom:1,
-                        background:selPart===p.id?`${g.col}20`:'rgba(5,8,15,.6)',
-                        border:`1px solid ${selPart===p.id?g.col+'55':'transparent'}`,
+                        background:selPart===p.id?`${g.col}20`:'rgba(248,250,252,.9)',
+                        border:`1px solid ${selPart===p.id?g.col+'55':'#e9edf2'}`,
                         transition:'all .1s'}}>
                       <div style={{fontSize:9,fontWeight:600,color:selPart===p.id?g.col:C.tx,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{p.name}</div>
                       <div style={{fontSize:7,color:C.sub,fontFamily:'monospace'}}>{p.id}</div>
@@ -1847,8 +1847,8 @@ function DigitalTwinView({project,addLog}){
                   ))}
                 </div>
                 {pages>1&&<div style={{display:'flex',gap:4,marginTop:4}}>
-                  <button disabled={page===0} onClick={()=>setPage(p=>p-1)} style={{flex:1,padding:'3px 0',fontSize:9,background:'rgba(30,41,59,.8)',border:'1px solid #1e293b',color:C.sub,borderRadius:4,cursor:page===0?'not-allowed':'pointer'}}>◀</button>
-                  <button disabled={page>=pages-1} onClick={()=>setPage(p=>p+1)} style={{flex:1,padding:'3px 0',fontSize:9,background:'rgba(30,41,59,.8)',border:'1px solid #1e293b',color:C.sub,borderRadius:4,cursor:page>=pages-1?'not-allowed':'pointer'}}>▶</button>
+                  <button disabled={page===0} onClick={()=>setPage(p=>p-1)} style={{flex:1,padding:'3px 0',fontSize:9,background:'#f1f5f9',border:'1px solid #cbd5e1',color:C.sub,borderRadius:4,cursor:page===0?'not-allowed':'pointer'}}>◀</button>
+                  <button disabled={page>=pages-1} onClick={()=>setPage(p=>p+1)} style={{flex:1,padding:'3px 0',fontSize:9,background:'#f1f5f9',border:'1px solid #cbd5e1',color:C.sub,borderRadius:4,cursor:page>=pages-1?'not-allowed':'pointer'}}>▶</button>
                 </div>}
               </div>}
             </div>
@@ -1857,7 +1857,7 @@ function DigitalTwinView({project,addLog}){
       </div>
 
       {/* ── 3D Viewer (mitte) ── */}
-      <div className="gc" style={{flex:'0 0 48%',position:'relative',background:'#03050a',borderRadius:14,overflow:'hidden',minHeight:320}}>
+      <div className="gc" style={{flex:'0 0 48%',position:'relative',background:'#f8fafc',borderRadius:14,overflow:'hidden',minHeight:320}}>
         <canvas ref={canvasRef} style={{display:cadFile?'none':'block',width:'100%',height:'100%',position:'absolute',inset:0}}/>
         {!cadFile&&<WashingMachine3D canvasRef={canvasRef}/>}
         <div ref={ovContRef} style={{display:cadFile?'block':'none',width:'100%',height:'100%',position:'absolute',inset:0}}/>
@@ -1867,14 +1867,14 @@ function DigitalTwinView({project,addLog}){
           </div>
           <div style={{position:'absolute',bottom:42,left:10,display:'flex',gap:6,pointerEvents:'none'}}>
             {[['Kapazität',product.specs.capacity],['Drehzahl',product.specs.rpm],['Energie',product.specs.energy]].map(([k,v])=>(
-              <div key={k} style={{background:'rgba(5,8,15,.7)',border:'1px solid #1e293b',borderRadius:6,padding:'3px 7px'}}>
-                <div style={{fontSize:7,color:'#475569',textTransform:'uppercase'}}>{k}</div>
-                <div style={{fontSize:10,fontWeight:800,color:'#e2e8f0'}}>{v}</div>
+              <div key={k} style={{background:'rgba(255,255,255,.85)',border:'1px solid #cbd5e1',borderRadius:6,padding:'3px 7px'}}>
+                <div style={{fontSize:7,color:'#64748b',textTransform:'uppercase'}}>{k}</div>
+                <div style={{fontSize:10,fontWeight:800,color:'#0f172a'}}>{v}</div>
               </div>
             ))}
           </div>
         </>}
-        {cadFile&&<div style={{position:'absolute',top:8,left:10,background:'rgba(5,8,15,.85)',border:'1px solid #1e3a5f',borderRadius:6,padding:'3px 8px',pointerEvents:'none'}}>
+        {cadFile&&<div style={{position:'absolute',top:8,left:10,background:'rgba(255,255,255,.9)',border:'1px solid #bfdbfe',borderRadius:6,padding:'3px 8px',pointerEvents:'none'}}>
           <div style={{fontSize:8,color:'#60a5fa',fontWeight:700}}>📐 {cadFile.name}</div>
         </div>}
         {selGrp&&!cadFile&&<div style={{position:'absolute',top:8,left:'50%',transform:'translateX(-50%)',background:`${curMeta.col}22`,border:`1px solid ${curMeta.col}44`,borderRadius:6,padding:'3px 9px',pointerEvents:'none'}}>
@@ -1905,7 +1905,7 @@ function DigitalTwinView({project,addLog}){
                 ['Kosten',partDetail.cost],['Lieferant',partDetail.sup],
                 ['Stadium',partDetail.stage],
               ].map(([k,v])=>(
-                <div key={k} style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',padding:'4px 0',borderBottom:'1px solid #0f172a',gap:8}}>
+                <div key={k} style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',padding:'4px 0',borderBottom:'1px solid #e2e8f0',gap:8}}>
                   <span style={{fontSize:9,color:C.sub,flexShrink:0}}>{k}</span>
                   <span style={{fontSize:9,fontWeight:600,color:k==='Stadium'?(stageCol[v]||C.tx):k==='Kosten'?'#fbbf24':C.tx,textAlign:'right',wordBreak:'break-word'}}>{v}</span>
                 </div>
@@ -1915,7 +1915,7 @@ function DigitalTwinView({project,addLog}){
                   <span style={{color:C.sub}}>Freigabefortschritt</span>
                   <span style={{color:partDetail.prog===100?'#34d399':'#fbbf24',fontWeight:700}}>{partDetail.prog}%</span>
                 </div>
-                <div style={{height:4,background:'#0f172a',borderRadius:2}}>
+                <div style={{height:4,background:'#e2e8f0',borderRadius:2}}>
                   <div style={{height:'100%',width:partDetail.prog+'%',background:partDetail.risk?'linear-gradient(90deg,#f59e0b,#fbbf24)':partDetail.prog===100?'linear-gradient(90deg,#22c55e,#4ade80)':'linear-gradient(90deg,#3b82f6,#60a5fa)',borderRadius:2,transition:'width .3s'}}/>
                 </div>
                 {partDetail.risk&&<div style={{fontSize:8,marginTop:6,color:'#f59e0b',background:'rgba(245,158,11,.08)',border:'1px solid rgba(245,158,11,.25)',borderRadius:4,padding:'3px 8px'}}>⚠ Single-Source-Risiko · Alternativlieferant prüfen</div>}
