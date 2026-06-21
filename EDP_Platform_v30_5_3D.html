@@ -1422,7 +1422,6 @@ function buildGroupParts(gid){
   if(gid==='gehaeuse'){
     const panels=[['Panel Oben','600×560×25 mm','2.10'],['Panel Unten','600×560×20 mm','1.95'],['Panel Links','25×560×900 mm','3.20'],['Panel Rechts','25×560×900 mm','3.20'],['Panel Rückseite','600×20×900 mm','4.10'],['Sockelblende','600×560×80 mm','1.80']];
     panels.forEach(([n,d,w])=>mk(n,'Kaufteil','Stahlblech DC01 0.8mm','28.40','ThyssenKrupp',  'Freigegeben',100,0,d,w));
-    for(let i=1;i<=12;i++) mk(`Rahmenprofil ${i:02}`.replace(':02','').padEnd(20),'Kaufteil','Stahlrohr 20×20×1.5mm','12.60','SSAB','Freigegeben',100,0,'900mm L','0.85');
     for(let i=1;i<=12;i++) mk(`Rahmenprofil_${String(i).padStart(2,'0')}`,'Kaufteil','Stahlrohr 20×20×1.5mm','12.60','SSAB','Freigegeben',100,0,'900mm L','0.85');
     for(let i=1;i<=4;i++) mk(`Nivellierfuß_${i}`,'Kaufteil','PA66 GF30','4.20','Freudenberg','Freigegeben',100,0,'Ø50×60mm','0.12');
     for(let i=1;i<=4;i++) mk(`Fuss_Gummimatte_${i}`,'Kaufteil','EPDM','1.80','Freudenberg','Freigegeben',100,0,'Ø56×8mm','0.04');
