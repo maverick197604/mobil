@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CAD 3D Viewer</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#0f1117;color:#e8eaf0;font-family:system-ui,sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+    #topbar{background:#1a1d27;border-bottom:1px solid #2a2d3a;padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+    #topbar h1{font-size:1rem;font-weight:600;letter-spacing:.02em}
+    #topbar .sub{font-size:.78rem;color:#6b7080;margin-left:auto}
+    #main{display:flex;flex:1;overflow:hidden}
+    #sidebar{width:260px;background:#13151f;border-right:1px solid #2a2d3a;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+    #drop-zone{margin:16px;border:2px dashed #2a2d3a;border-radius:10px;padding:24px 12px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s}
+    #drop-zone:hover,#drop-zone.over{border-color:#5b7fde;background:#1a2040}
+    #drop-zone input{display:none}
+    #drop-zone .icon{font-size:2rem;display:block;margin-bottom:8px}
+    #drop-zone p{font-size:.82rem;color:#9095a8;line-height:1.5}
+    #drop-zone strong{color:#5b7fde;display:block;margin-top:6px;font-size:.85rem}
+    #file-list{flex:1;padding:0 12px 12px}
+    #file-list h2{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:#6b7080;margin:0 4px 8px}
+    .file-item{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;cursor:pointer;transition:background .15s;font-size:.82rem;border:1px solid transparent}
+    .file-item:hover{background:#1e2132}
+    .file-item.active{background:#1a2040;border-color:#3a4d8a}
+    .file-item .fi-icon{font-size:1.1rem;flex-shrink:0}
+    .file-item .fi-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .file-item .fi-size{font-size:.7rem;color:#6b7080;margin-left:auto;flex-shrink:0}
+    #viewer{flex:1;position:relative;overflow:hidden}
+    canvas{display:block;width:100%;height:100%}
+    #placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#6b7080;pointer-events:none}
+    #placeholder .ph-icon{font-size:3rem;opacity:.3}
+    #loading{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#0f1117cc;backdrop-filter:blur(4px)}
+    .spinner{width:36px;height:36px;border:3px solid #2a2d3a;border-top-color:#5b7fde;border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    #toolbar{position:absolute;top:12px;left:50%;transform:translateX(-50%);display:none;gap:4px;background:#0f1117cc;border:1px solid #2a2d3a;border-radius:10px;padding:6px 8px;backdrop-filter:blur(8px);z-index:10;flex-wrap:wrap;justify-content:center}
+    .tb-group{display:flex;gap:3px}
+    .tb-group+.tb-group{border-left:1px solid #2a2d3a;padding-left:6px;margin-left:3px}
+    .tb-btn{background:#1a1d27;border:1px solid #2a2d3a;color:#e8eaf0;font-size:.75rem;padding:5px 9px;border-radius:6px;cursor:pointer;transition:all .15s;white-space:nowrap}
+    .tb-btn:hover{background:#252840}
+    .tb-btn.active{background:#3a4d8a;border-color:#5b7fde;color:#fff}
+    .tb-btn.sec{color:#9095a8}
+    #hint{position:absolute;bottom:12px;right:12px;background:#0f1117bb;color:#6b7080;font-size:.68rem;padding:5px 10px;border-radius:6px;pointer-events:none;display:none;line-height:1.7}
+    #tp{position:absolute;bottom:12px;left:12px;background:#0f1117cc;border:1px solid #2a2d3a;border-radius:10px;padding:10px 12px;backdrop-filter:blur(8px);display:none;font-size:.74rem;min-width:240px}
+    .tp-hdr{display:grid;grid-template-columns:18px 1fr 1fr 1fr;gap:4px;color:#6b7080;font-size:.68rem;text-align:center;padding-top:4px}
+    .tp-row{display:grid;grid-template-columns:18px 1fr 1fr 1fr;gap:4px;align-items:center;margin-bottom:3px}
+    .tp-lbl{color:#6b7080;font-size:.7rem;font-weight:700;text-align:center}
+    .tp-inp{background:#1a1d27;border:1px solid #2a2d3a;color:#e8eaf0;font-size:.72rem;padding:3px 5px;border-radius:4px;width:100%;text-align:right;-moz-appearance:textfield}
+    .tp-inp::-webkit-outer-spin-button,.tp-inp::-webkit-inner-spin-button{-webkit-appearance:none}
+    .tp-inp:focus{outline:none;border-color:#5b7fde}
+    #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a1d27;border:1px solid #2a2d3a;color:#e8eaf0;padding:9px 18px;border-radius:8px;font-size:.85rem;display:none;z-index:99;pointer-events:none}
+  </style>
+</head>
+<body>
+
+<div id="topbar">
+  <span style="font-size:1.2rem">⚙</span>
+  <h1>CAD 3D Viewer</h1>
+  <span class="sub">STL / Lokale Dateien &nbsp;|&nbsp; Kein Server nötig</span>
+</div>
+
+<div id="main">
+  <div id="sidebar">
+    <!-- Drop Zone -->
+    <div id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <input type="file" id="file-input" accept=".stl,.obj" multiple/>
+      <span class="icon">📂</span>
+      <p>STL-Datei hier ablegen</p>
+      <strong>oder klicken zum Auswählen</strong>
+    </div>
+
+    <!-- File list -->
+    <div id="file-list">
+      <h2>Geladene Dateien</h2>
+      <div id="items"></div>
+    </div>
+  </div>
+
+  <div id="viewer">
+    <canvas id="c"></canvas>
+    <div id="placeholder">
+      <span class="ph-icon">🔩</span>
+      <p>STL-Datei auswählen oder ablegen</p>
+      <p style="font-size:.75rem">Tipp: uploads/nasa-juno-001.stl aus dem Repo-Ordner</p>
+    </div>
+    <div id="loading"><div class="spinner"></div><span>Wird geladen…</span></div>
+
+    <!-- Toolbar -->
+    <div id="toolbar">
+      <div class="tb-group">
+        <button class="tb-btn active" id="btn-orb" onclick="setMode('orbit')">🖱 Ansicht</button>
+        <button class="tb-btn" id="btn-mov" onclick="setMode('translate')" title="G">↔ Bewegen</button>
+        <button class="tb-btn" id="btn-rot" onclick="setMode('rotate')"    title="R">↻ Drehen</button>
+        <button class="tb-btn" id="btn-scl" onclick="setMode('scale')"     title="S">⤢ Skalieren</button>
+      </div>
+      <div class="tb-group">
+        <button class="tb-btn sec" onclick="resetObj()">⟳ Reset</button>
+        <button class="tb-btn sec" onclick="exportStl()">⬇ STL</button>
+      </div>
+    </div>
+
+    <!-- Transform panel -->
+    <div id="tp">
+      <div class="tp-row">
+        <span class="tp-lbl">X</span>
+        <input class="tp-inp" id="px" type="number" step="0.1" value="0" onchange="applyPanel()">
+        <input class="tp-inp" id="rx" type="number" step="1"   value="0" onchange="applyPanel()">
+        <input class="tp-inp" id="sx" type="number" step="0.1" value="1" min="0.01" onchange="applyPanel()">
+      </div>
+      <div class="tp-row">
+        <span class="tp-lbl">Y</span>
+        <input class="tp-inp" id="py" type="number" step="0.1" value="0" onchange="applyPanel()">
+        <input class="tp-inp" id="ry" type="number" step="1"   value="0" onchange="applyPanel()">
+        <input class="tp-inp" id="sy" type="number" step="0.1" value="1" min="0.01" onchange="applyPanel()">
+      </div>
+      <div class="tp-row">
+        <span class="tp-lbl">Z</span>
+        <input class="tp-inp" id="pz" type="number" step="0.1" value="0" onchange="applyPanel()">
+        <input class="tp-inp" id="rz" type="number" step="1"   value="0" onchange="applyPanel()">
+        <input class="tp-inp" id="sz" type="number" step="0.1" value="1" min="0.01" onchange="applyPanel()">
+      </div>
+      <div class="tp-hdr"><span></span><span>Position</span><span>Rotation °</span><span>Skalierung</span></div>
+    </div>
+
+    <div id="hint">Drehen: Ziehen &nbsp;|&nbsp; Zoom: Scrollen &nbsp;|&nbsp; Verschieben: Rechtsklick</div>
+    <div id="toast"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/TransformControls.js"></script>
+<script>
+// ---- Scene setup ----
+const canvas   = document.getElementById('c');
+const viewer   = document.getElementById('viewer');
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setClearColor(0x0f1117,1);
+renderer.shadowMap.enabled = true;
+
+const scene  = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 100000);
+camera.position.set(0,0,5);
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.45));
+const key = new THREE.DirectionalLight(0xffffff, 0.9); key.position.set(5,10,7); scene.add(key);
+const fill = new THREE.DirectionalLight(0x8899ff, 0.35); fill.position.set(-6,-4,-5); scene.add(fill);
+
+const orbit = new THREE.OrbitControls(camera, renderer.domElement);
+orbit.enableDamping = true; orbit.dampingFactor = 0.08;
+orbit.screenSpacePanning = true;
+
+const tc = new THREE.TransformControls(camera, renderer.domElement);
+tc.addEventListener('dragging-changed', e => { orbit.enabled = !e.value; });
+tc.addEventListener('change', syncPanel);
+scene.add(tc);
+
+let mesh = null, mode = 'orbit';
+const files = [];
+
+function resize(){
+  const w = viewer.clientWidth, h = viewer.clientHeight;
+  renderer.setSize(w,h,false);
+  camera.aspect = w/h; camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(viewer); resize();
+
+(function loop(){ requestAnimationFrame(loop); orbit.update(); renderer.render(scene,camera); })();
+
+// ---- File loading ----
+document.getElementById('file-input').addEventListener('change', e => loadFiles(e.target.files));
+const dz = document.getElementById('drop-zone');
+dz.addEventListener('dragover', e=>{ e.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', ()=> dz.classList.remove('over'));
+dz.addEventListener('drop', e=>{ e.preventDefault(); dz.classList.remove('over'); loadFiles(e.dataTransfer.files); });
+
+function loadFiles(flist){
+  [...flist].forEach(f => {
+    if(!f.name.toLowerCase().endsWith('.stl')) return toast('Nur STL-Dateien unterstützt.','');
+    const idx = files.push({name:f.name, size:f.size, file:f})-1;
+    renderFileList();
+    loadSTL(idx);
+  });
+}
+
+function renderFileList(){
+  const el = document.getElementById('items');
+  el.innerHTML = files.map((f,i) => `
+    <div class="file-item${f.active?' active':''}" onclick="loadSTL(${i})">
+      <span class="fi-icon">📄</span>
+      <span class="fi-name">${f.name}</span>
+      <span class="fi-size">${(f.size/1024).toFixed(0)} KB</span>
+    </div>`).join('');
+}
+
+function loadSTL(idx){
+  files.forEach((f,i) => f.active = i===idx);
+  renderFileList();
+  const f = files[idx];
+
+  document.getElementById('placeholder').style.display = 'none';
+  document.getElementById('loading').style.display = 'flex';
+  document.getElementById('toolbar').style.display = 'none';
+  document.getElementById('tp').style.display = 'none';
+  document.getElementById('hint').style.display = 'none';
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    const loader = new THREE.STLLoader();
+    const geom   = loader.parse(e.target.result);
+    geom.computeVertexNormals();
+    geom.center();
+
+    if(mesh){ scene.remove(mesh); mesh.geometry.dispose(); mesh.material.dispose(); }
+    mesh = new THREE.Mesh(geom, new THREE.MeshPhongMaterial({color:0x4a7ac8,specular:0x223355,shininess:60}));
+    mesh.castShadow = true;
+    scene.add(mesh);
+
+    // Fit camera
+    const box = new THREE.Box3().setFromObject(mesh);
+    const size = box.getSize(new THREE.Vector3()).length();
+    orbit.reset(); orbit.minDistance=size*0.05; orbit.maxDistance=size*50;
+    camera.near = size*0.001; camera.far = size*100; camera.updateProjectionMatrix();
+    camera.position.copy(box.getCenter(new THREE.Vector3())).add(new THREE.Vector3(0,0,size*1.5));
+    orbit.target.copy(box.getCenter(new THREE.Vector3()));
+
+    if(mode!=='orbit') tc.attach(mesh);
+    syncPanel();
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('toolbar').style.display = 'flex';
+    document.getElementById('tp').style.display = 'block';
+    document.getElementById('hint').style.display = 'block';
+  };
+  reader.readAsArrayBuffer(f.file);
+}
+
+// ---- Edit modes ----
+function setMode(m){
+  mode = m;
+  ['orb','mov','rot','scl'].forEach(id => document.getElementById('btn-'+id).classList.remove('active'));
+  if(m==='orbit')    { document.getElementById('btn-orb').classList.add('active'); tc.detach(); orbit.enabled=true; }
+  if(m==='translate'){ document.getElementById('btn-mov').classList.add('active'); tc.setMode('translate'); if(mesh) tc.attach(mesh); }
+  if(m==='rotate')   { document.getElementById('btn-rot').classList.add('active'); tc.setMode('rotate');    if(mesh) tc.attach(mesh); }
+  if(m==='scale')    { document.getElementById('btn-scl').classList.add('active'); tc.setMode('scale');     if(mesh) tc.attach(mesh); }
+}
+
+window.addEventListener('keydown', e => {
+  if(!mesh || e.target.tagName==='INPUT') return;
+  if(e.key==='g'||e.key==='G') setMode('translate');
+  if(e.key==='r'||e.key==='R') setMode('rotate');
+  if(e.key==='s'||e.key==='S') setMode('scale');
+  if(e.key==='o'||e.key==='O'||e.key==='Escape') setMode('orbit');
+});
+
+function syncPanel(){
+  if(!mesh) return;
+  const d = THREE.MathUtils.radToDeg;
+  document.getElementById('px').value = mesh.position.x.toFixed(2);
+  document.getElementById('py').value = mesh.position.y.toFixed(2);
+  document.getElementById('pz').value = mesh.position.z.toFixed(2);
+  document.getElementById('rx').value = d(mesh.rotation.x).toFixed(1);
+  document.getElementById('ry').value = d(mesh.rotation.y).toFixed(1);
+  document.getElementById('rz').value = d(mesh.rotation.z).toFixed(1);
+  document.getElementById('sx').value = mesh.scale.x.toFixed(3);
+  document.getElementById('sy').value = mesh.scale.y.toFixed(3);
+  document.getElementById('sz').value = mesh.scale.z.toFixed(3);
+}
+
+function applyPanel(){
+  if(!mesh) return;
+  const r = THREE.MathUtils.degToRad;
+  mesh.position.set(+px.value,+py.value,+pz.value);
+  mesh.rotation.set(r(+rx.value),r(+ry.value),r(+rz.value));
+  mesh.scale.set(+sx.value||0.01,+sy.value||0.01,+sz.value||0.01);
+}
+
+function resetObj(){
+  if(!mesh) return;
+  mesh.position.set(0,0,0); mesh.rotation.set(0,0,0); mesh.scale.set(1,1,1);
+  syncPanel(); toast('Transform zurückgesetzt','');
+}
+
+function exportStl(){
+  if(!mesh) return;
+  const g = mesh.geometry.clone(); g.applyMatrix4(mesh.matrixWorld);
+  const pos = g.attributes.position, n = pos.count/3;
+  const buf = new ArrayBuffer(84+n*50); const v = new DataView(buf);
+  const hdr='CAD Viewer Export'; for(let i=0;i<80;i++) v.setUint8(i,i<hdr.length?hdr.charCodeAt(i):0);
+  v.setUint32(80,n,true);
+  let off=84;
+  for(let i=0;i<n;i++){
+    const ax=pos.getX(i*3),ay=pos.getY(i*3),az=pos.getZ(i*3);
+    const bx=pos.getX(i*3+1),by=pos.getY(i*3+1),bz=pos.getZ(i*3+1);
+    const cx=pos.getX(i*3+2),cy=pos.getY(i*3+2),cz=pos.getZ(i*3+2);
+    const ux=bx-ax,uy=by-ay,uz=bz-az,vx=cx-ax,vy=cy-ay,vz=cz-az;
+    const nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx;
+    const nl=Math.sqrt(nx*nx+ny*ny+nz*nz)||1;
+    v.setFloat32(off,nx/nl,true);v.setFloat32(off+4,ny/nl,true);v.setFloat32(off+8,nz/nl,true);
+    v.setFloat32(off+12,ax,true);v.setFloat32(off+16,ay,true);v.setFloat32(off+20,az,true);
+    v.setFloat32(off+24,bx,true);v.setFloat32(off+28,by,true);v.setFloat32(off+32,bz,true);
+    v.setFloat32(off+36,cx,true);v.setFloat32(off+40,cy,true);v.setFloat32(off+44,cz,true);
+    v.setUint16(off+48,0,true); off+=50;
+  }
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([buf],{type:'model/stl'}));
+  a.download='modell_bearbeitet.stl'; a.click(); URL.revokeObjectURL(a.href);
+  toast('STL heruntergeladen',''); g.dispose();
+}
+
+let toastTimer;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.style.display='block';
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.style.display='none',2500);
+}
+</script>
+</body>
+</html>
