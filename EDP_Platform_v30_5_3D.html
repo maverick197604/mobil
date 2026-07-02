@@ -659,15 +659,41 @@ const PRODUCTS=[{id:'p1',brand:'Anacon',name:'AW-3000 Offshore Windturbine',rele
   model3d:'wind_turbine',
   specs:{capacity:'3,0 MW',rpm:'14,3 U/min',energy:'IEC IIA',noise:'104 dB(A)',programs:0},
   bom:[
-  {id:'b1',name:'Turm-Stahlkonstruktion (3-skt.)',icon:'box',layer:0,cost:'820.000 EUR',risk:false,supplier:'Anacon Rostock',stage:'Freigegeben',progress:100},
-  {id:'b2',name:'Rotorblatt GFK/CFK (× 3)',icon:'wind',layer:1,cost:'420.000 EUR',risk:false,supplier:'SGL Carbon Wackersdorf',stage:'Freigegeben',progress:100},
-  {id:'b3',name:'PMSG Generator 3 MW',icon:'cpu',layer:2,cost:'580.000 EUR',risk:true,supplier:'Enercon Aurich',stage:'Serienabnahme',progress:94},
-  {id:'b4',name:'Hauptlager SKF (× 2)',icon:'circle',layer:1,cost:'48.000 EUR',risk:false,supplier:'SKF Gothenburg',stage:'Freigegeben',progress:100},
-  {id:'b5',name:'Umrichter ABB PCS6000',icon:'zap',layer:1,cost:'190.000 EUR',risk:false,supplier:'ABB Turgi CH',stage:'Freigegeben',progress:100},
-  {id:'b6',name:'Pitch-Antrieb (× 3)',icon:'rotate-cw',layer:2,cost:'54.000 EUR',risk:false,supplier:'Liebherr Components',stage:'Freigegeben',progress:100},
-  {id:'b7',name:'Fundament Monopile Offshore',icon:'anchor',layer:0,cost:'1.200.000 EUR',risk:true,supplier:'EEW Special Pipe',stage:'Freigegeben',progress:100},
-  {id:'b8',name:'SCADA / Steuerung',icon:'monitor',layer:3,cost:'32.000 EUR',risk:false,supplier:'Beckhoff Automation',stage:'Softwaretest',progress:88},
-  {id:'b9',name:'Gondel-Gehäuse GFK',icon:'home',layer:0,cost:'85.000 EUR',risk:false,supplier:'Anacon Bremerhaven',stage:'Freigegeben',progress:100},
+  /* ── Root ── */
+  {id:'a0',name:'AW-3000 Offshore Windturbine',type:'assembly',icon:'wind',layer:0,cost:'3.993.500 EUR',risk:false,supplier:'Anacon',stage:'Design Freeze',progress:98},
+  /* ── Gründung & Turm ── */
+  {id:'a1',name:'Gründung & Turm',type:'assembly',icon:'anchor',layer:1,parentId:'a0',cost:'2.180.000 EUR',risk:true,supplier:'Anacon Rostock',stage:'Freigegeben',progress:100},
+  {id:'b7',name:'Monopile EEW Ø8m × 42m',type:'part',icon:'minus',layer:2,parentId:'a1',cost:'820.000 EUR',risk:true,supplier:'EEW Special Pipe',stage:'Freigegeben',progress:100},
+  {id:'b1a',name:'Transition Piece Stahl 58 t',type:'part',icon:'box',layer:2,parentId:'a1',cost:'125.000 EUR',risk:false,supplier:'Anacon Rostock',stage:'Freigegeben',progress:100},
+  {id:'b1',name:'Turmsektion 1-3 (S355J2+N, 75 m)',type:'part',icon:'box',layer:2,parentId:'a1',cost:'655.000 EUR',risk:false,supplier:'Anacon Rostock',stage:'Freigegeben',progress:100},
+  {id:'b1b',name:'Korrosionsschutz Jotun C5-M',type:'part',icon:'droplets',layer:2,parentId:'a1',cost:'30.400 EUR',risk:false,supplier:'Jotun Coatings',stage:'Freigegeben',progress:100},
+  {id:'b1c',name:'Blitzschutz & Erdung Dehn',type:'part',icon:'zap',layer:2,parentId:'a1',cost:'6.600 EUR',risk:false,supplier:'Dehn + Söhne',stage:'Freigegeben',progress:100},
+  /* ── Rotor-Baugruppe ── */
+  {id:'a2',name:'Rotor-Baugruppe',type:'assembly',icon:'rotate-cw',layer:1,parentId:'a0',cost:'564.000 EUR',risk:false,supplier:'Anacon',stage:'Freigegeben',progress:100},
+  {id:'b4a',name:'Nabe GJS-400 Ø3200mm',type:'part',icon:'circle',layer:2,parentId:'a2',cost:'42.000 EUR',risk:false,supplier:'Siempelkamp',stage:'Freigegeben',progress:100},
+  {id:'b2',name:'Rotorblatt GFK/CFK 63m (× 3)',type:'part',icon:'wind',layer:2,parentId:'a2',cost:'420.000 EUR',risk:false,supplier:'SGL Carbon Wackersdorf',stage:'Freigegeben',progress:100},
+  {id:'b4',name:'Hauptlager SKF 240/1250 (× 2)',type:'part',icon:'circle',layer:2,parentId:'a2',cost:'48.000 EUR',risk:false,supplier:'SKF Gothenburg',stage:'Freigegeben',progress:100},
+  {id:'b6',name:'Pitch-Antrieb Liebherr (× 3)',type:'part',icon:'sliders',layer:2,parentId:'a2',cost:'54.000 EUR',risk:false,supplier:'Liebherr Components',stage:'Freigegeben',progress:100},
+  /* ── Gondel-Baugruppe ── */
+  {id:'a3',name:'Gondel-Baugruppe',type:'assembly',icon:'home',layer:1,parentId:'a0',cost:'893.500 EUR',risk:true,supplier:'Anacon',stage:'Serienabnahme',progress:97},
+  {id:'b9',name:'Gondelgehäuse GFK + Hauptrahmen Stahl',type:'part',icon:'home',layer:2,parentId:'a3',cost:'85.000 EUR',risk:false,supplier:'Anacon Bremerhaven',stage:'Freigegeben',progress:100},
+  {id:'b3',name:'PMSG Generator 3 MW',type:'part',icon:'cpu',layer:2,parentId:'a3',cost:'580.000 EUR',risk:true,supplier:'Enercon Aurich',stage:'Serienabnahme',progress:94},
+  {id:'b5',name:'Umrichter ABB PCS6000 3MVA',type:'part',icon:'zap',layer:2,parentId:'a3',cost:'190.000 EUR',risk:false,supplier:'ABB Turgi CH',stage:'Freigegeben',progress:100},
+  {id:'b9a',name:'Yaw-Lager Rothe Erde + 6× SEW Antrieb',type:'part',icon:'refresh-cw',layer:2,parentId:'a3',cost:'38.500 EUR',risk:false,supplier:'SEW Eurodrive',stage:'Freigegeben',progress:100},
+  /* ── Elektrik, Kabel & Offshore ── */
+  {id:'a4',name:'Elektrik, Kabel & Offshore',type:'assembly',icon:'activity',layer:1,parentId:'a0',cost:'308.000 EUR',risk:false,supplier:'Anacon',stage:'Freigegeben',progress:100},
+  {id:'b4b',name:'Transformator ABB RESIBLOC 0.69/33kV',type:'part',icon:'activity',layer:2,parentId:'a4',cost:'48.000 EUR',risk:false,supplier:'ABB Transformers',stage:'Freigegeben',progress:100},
+  {id:'b4c',name:'Nexans 33kV Seekabel CU 3×240mm² 5km',type:'part',icon:'git-commit',layer:2,parentId:'a4',cost:'180.000 EUR',risk:false,supplier:'Nexans',stage:'Freigegeben',progress:100},
+  {id:'b4d',name:'NSHV Rittal TS8 + Schütz Siemens',type:'part',icon:'layers',layer:2,parentId:'a4',cost:'28.000 EUR',risk:false,supplier:'Rittal / Siemens',stage:'Freigegeben',progress:100},
+  {id:'b4e',name:'Schaltanlage ABB ZX2 33kV',type:'part',icon:'toggle-right',layer:2,parentId:'a4',cost:'28.000 EUR',risk:false,supplier:'ABB',stage:'Freigegeben',progress:100},
+  {id:'b4f',name:'USV APC Smart-UPS 10kVA',type:'part',icon:'battery',layer:2,parentId:'a4',cost:'4.800 EUR',risk:false,supplier:'APC Schneider',stage:'Freigegeben',progress:100},
+  /* ── Software & Steuerung (sBOM) ── */
+  {id:'sw0',name:'Software & Steuerung',type:'software',icon:'code',layer:1,parentId:'a0',cost:'48.000 EUR',risk:false,supplier:'Anacon Digital',stage:'Softwaretest',progress:88},
+  {id:'sw1',name:'Beckhoff TwinCAT 3.1 Build 4026 Runtime',type:'software',icon:'terminal',layer:2,parentId:'sw0',cost:'8.400 EUR',risk:false,supplier:'Beckhoff Automation',stage:'Freigegeben',progress:100},
+  {id:'sw2',name:'Anacon WPS SCADA v4.2.1',type:'software',icon:'monitor',layer:2,parentId:'sw0',cost:'18.000 EUR',risk:false,supplier:'Anacon Digital',stage:'Softwaretest',progress:85},
+  {id:'sw3',name:'AVEVA OSIsoft PI Historian v2024',type:'software',icon:'database',layer:2,parentId:'sw0',cost:'12.000 EUR',risk:false,supplier:'AVEVA OSIsoft',stage:'Freigegeben',progress:100},
+  {id:'sw4',name:'Pilz SafetyDESIGNER SIL-2 Firmware',type:'software',icon:'shield',layer:2,parentId:'sw0',cost:'4.800 EUR',risk:false,supplier:'Pilz GmbH',stage:'Freigegeben',progress:100},
+  {id:'sw5',name:'SKF @ptitude Analyst CMS v2.7',type:'software',icon:'bar-chart-2',layer:2,parentId:'sw0',cost:'4.800 EUR',risk:false,supplier:'SKF Gothenburg',stage:'Bemusterung',progress:72},
 ]}];
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1032,15 +1058,65 @@ function RFLPView({project,addLog}){
   );
 }
 
-// PRODUKT (E-BOM / M-BOM / S-BOM)
+// PRODUKT (E-BOM / M-BOM / S-BOM) — hierarchischer Baum-View
 function ProductBOMView({project,addLog}){
   const [bomType,setBomType]=useState('eBOM');
-  const [sel,setSel]=useState(PRODUCTS[0].bom[0].id);
   const product=PRODUCTS[0];
-  const part=product.bom.find(b=>b.id===sel);
+  const [expanded,setExpanded]=useState(()=>new Set(['a0','a1','a2','a3','a4','sw0']));
+  const [sel,setSel]=useState(null);
   useEscape(()=>setSel(null),!!sel);
   const bomDocs={eBOM:'Engineering BOM (R&D)',mBOM:'Manufacturing BOM (Fertigung)',sBOM:'Service BOM (After-Sales)'};
   const bomSrc={eBOM:['sys_tc'],mBOM:['sys_sap','sys_nex'],sBOM:['sys_sap']};
+  const typeCol={assembly:'#818cf8',part:'#60a5fa',software:'#34d399'};
+  const stageCol={'Freigegeben':'#34d399','Serienabnahme':'#fbbf24','Bemusterung':'#60a5fa','Softwaretest':'#38bdf8','Design Freeze':'#a78bfa','Konzept':'#94a3b8'};
+
+  const showSW=bomType!=='mBOM';
+  const isVisible=(b)=>b.type==='software'?showSW:true;
+
+  const childMap=useMemo(()=>{
+    const m={};
+    product.bom.forEach(b=>{if(b.parentId){if(!m[b.parentId])m[b.parentId]=[];m[b.parentId].push(b);}});
+    return m;
+  },[]);
+
+  const rootItems=useMemo(()=>product.bom.filter(b=>!b.parentId),[]);
+  const part=product.bom.find(b=>b.id===sel);
+  const toggleExp=(id)=>setExpanded(s=>{const n=new Set(s);n.has(id)?n.delete(id):n.add(id);return n;});
+
+  function renderNode(b,level){
+    if(!isVisible(b))return null;
+    const children=(childMap[b.id]||[]).filter(isVisible);
+    const hasChildren=children.length>0;
+    const isExp=expanded.has(b.id);
+    const isS=sel===b.id;
+    const tc=typeCol[b.type]||'#60a5fa';
+    return(
+      <React.Fragment key={b.id}>
+        <div onClick={()=>{if(hasChildren)toggleExp(b.id);setSel(b.id);}}
+          style={{display:'flex',alignItems:'center',gap:5,
+            padding:`5px 8px 5px ${8+level*16}px`,borderRadius:6,cursor:'pointer',marginBottom:2,
+            background:isS?`${tc}18`:'rgba(241,245,249,.85)',
+            border:`1px solid ${isS?tc+'55':'#e2e8f0'}`,transition:'all .1s'}}>
+          <span style={{width:12,fontSize:11,color:isS?tc:'#94a3b8',flexShrink:0,lineHeight:1}}>
+            {hasChildren?(isExp?'▾':'▸'):'·'}
+          </span>
+          <div style={{width:7,height:7,borderRadius:b.type==='software'?'50%':2,background:tc,flexShrink:0}}/>
+          {b.type==='assembly'&&<span style={{fontSize:7,fontWeight:900,padding:'1px 4px',borderRadius:3,background:'#818cf818',color:'#818cf8',border:'1px solid #818cf830',flexShrink:0}}>ASM</span>}
+          {b.type==='software'&&<span style={{fontSize:7,fontWeight:900,padding:'1px 4px',borderRadius:3,background:'#34d39918',color:'#34d399',border:'1px solid #34d39930',flexShrink:0}}>SW</span>}
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontSize:b.type==='assembly'?11:10,fontWeight:b.type==='assembly'?800:600,color:isS?tc:C.tx,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{b.name}</div>
+            {level>0&&<div style={{fontSize:8,color:C.sub,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{b.supplier}</div>}
+          </div>
+          <div style={{textAlign:'right',flexShrink:0,marginLeft:4}}>
+            <div style={{fontSize:9,fontWeight:700,color:'#f59e0b',whiteSpace:'nowrap'}}>{b.cost}</div>
+            {b.risk&&<div style={{fontSize:7,color:'#f87171'}}>⚠ Risk</div>}
+          </div>
+        </div>
+        {hasChildren&&isExp&&children.map(c=>renderNode(c,level+1))}
+      </React.Fragment>
+    );
+  }
+
   return(
     <div className="sli" style={{height:'100%',display:'flex',flexDirection:'column',padding:18,overflow:'hidden'}}>
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14,flexShrink:0}}>
@@ -1054,42 +1130,29 @@ function ProductBOMView({project,addLog}){
         {Object.keys(bomDocs).map(b=><button key={b} onClick={()=>setBomType(b)} className="btn-hover" style={{padding:'8px 16px',borderRadius:7,border:'1px solid '+(bomType===b?'#818cf8':'#1e293b'),background:bomType===b?'rgba(99,102,241,.12)':'transparent',color:bomType===b?'#818cf8':'#94a3b8',fontSize:11,fontWeight:700,cursor:'pointer'}}>{b} <span style={{fontWeight:400,color:C.sub,marginLeft:5}}>{bomDocs[b]}</span></button>)}
       </div>
       <div style={{flex:1,display:'flex',gap:14,minHeight:0}}>
-        <div className="sb" style={{flex:1,overflowY:'auto',display:'flex',flexDirection:'column',gap:8}}>
-          {product.bom.map(b=>{const isS=sel===b.id;return(
-            <div key={b.id} onClick={()=>setSel(b.id)} className="gc btn-hover" style={{padding:12,cursor:'pointer',borderColor:isS?'#3b82f6':'rgba(255,255,255,.08)',borderLeft:'3px solid '+(b.risk?'#f59e0b':'#3b82f6')}}>
-              <div style={{display:'flex',gap:10,alignItems:'center'}}>
-                <div style={{padding:7,borderRadius:7,background:isS?'#2563eb':'#1e293b',flexShrink:0}}><i data-lucide={b.icon} style={{width:14,height:14,color:isS?'#fff':'#94a3b8'}}></i></div>
-                <div style={{flex:1}}>
-                  <div style={{fontSize:9,color:C.sub,fontFamily:'monospace'}}>{b.id.toUpperCase()}</div>
-                  <div style={{fontSize:13,fontWeight:700,color:C.tx}}>{b.name}</div>
-                  <div style={{fontSize:10,color:C.sub,marginTop:1}}>{b.supplier}</div>
-                </div>
-                <div style={{textAlign:'right'}}>
-                  <div style={{fontSize:12,fontWeight:800,color:'#fbbf24'}}>{b.cost}</div>
-                  <div style={{fontSize:9,color:C.sub,marginTop:1}}>{b.stage}</div>
-                </div>
-              </div>
-              <div style={{display:'flex',justifyContent:'space-between',marginTop:7,fontSize:9,color:C.sub}}><span>Fortschritt</span><span>{b.progress}%</span></div>
-              <div style={{width:'100%',background:'#1e293b',height:4,borderRadius:4,marginTop:3}}><div style={{width:b.progress+'%',height:4,background:b.progress===100?'#34d399':'#3b82f6',borderRadius:4}}/></div>
-            </div>
-          );})}
+        {/* ── BOM-Baum ── */}
+        <div className="sb" style={{flex:1,overflowY:'auto'}}>
+          {rootItems.filter(isVisible).map(b=>renderNode(b,0))}
         </div>
-        {part && (
-          <div className="gc scale-in" style={{width:320,padding:18,alignSelf:'flex-start',maxHeight:'100%',overflowY:'auto'}}>
+        {/* ── Detail-Panel ── */}
+        {part&&(
+          <div className="gc scale-in" style={{width:300,padding:18,alignSelf:'flex-start',maxHeight:'100%',overflowY:'auto'}}>
             <div style={{display:'flex',justifyContent:'space-between',marginBottom:10}}>
-              <div style={{fontSize:9,fontWeight:800,color:'#60a5fa',textTransform:'uppercase',letterSpacing:1}}>{bomType} Detail</div>
+              <div style={{fontSize:9,fontWeight:800,color:typeCol[part.type]||'#60a5fa',textTransform:'uppercase',letterSpacing:1}}>
+                {part.type==='assembly'?'Baugruppe':part.type==='software'?'Software':'Bauteil'} · {bomType}
+              </div>
               <button onClick={()=>setSel(null)} style={{background:'none',border:'none',color:C.sub,cursor:'pointer',fontSize:18}}>×</button>
             </div>
-            <div style={{fontSize:15,fontWeight:800,color:C.tx,marginBottom:14}}>{part.name}</div>
-            <InfoRow label="Stückliste" val={bomType}/>
+            <div style={{fontSize:14,fontWeight:800,color:C.tx,marginBottom:14,lineHeight:1.3}}>{part.name}</div>
             <InfoRow label="ID" val={part.id.toUpperCase()}/>
             <InfoRow label="Lieferant" val={part.supplier}/>
-            <InfoRow label="Stage" val={part.stage}/>
+            <InfoRow label="Stage" val={part.stage} col={stageCol[part.stage]||C.tx}/>
             <InfoRow label="Fortschritt" val={part.progress+'%'} col={part.progress===100?'#34d399':'#fbbf24'}/>
-            <InfoRow label="Kosten" val={part.cost} col="#fbbf24"/>
+            <InfoRow label="Kosten" val={part.cost} col="#f59e0b"/>
             <InfoRow label="Risk" val={part.risk?'⚠ Single Source':'OK'} col={part.risk?'#f87171':'#34d399'}/>
-            {bomType==='mBOM' && <div style={{marginTop:12,padding:'10px 12px',borderRadius:8,background:'rgba(52,211,153,.08)',border:'1px solid rgba(52,211,153,.2)'}}><div style={{fontSize:9,fontWeight:800,color:'#34d399',textTransform:'uppercase',marginBottom:4}}>Fertigungsroute (SAP)</div><div style={{fontSize:11,color:'#cbd5e1'}}>Werk Traunreut · Linie M7 · Station ST-040</div></div>}
-            {bomType==='sBOM' && <div style={{marginTop:12,padding:'10px 12px',borderRadius:8,background:'rgba(251,146,60,.08)',border:'1px solid rgba(251,146,60,.2)'}}><div style={{fontSize:9,fontWeight:800,color:'#fb923c',textTransform:'uppercase',marginBottom:4}}>Service-Info</div><div style={{fontSize:11,color:'#cbd5e1'}}>Ersatzteil-Nr.: {part.id.toUpperCase()}-SP · Verfügbarkeit: 10+ Jahre</div></div>}
+            {bomType==='mBOM'&&part.type!=='software'&&<div style={{marginTop:12,padding:'10px 12px',borderRadius:8,background:'rgba(52,211,153,.08)',border:'1px solid rgba(52,211,153,.2)'}}><div style={{fontSize:9,fontWeight:800,color:'#34d399',textTransform:'uppercase',marginBottom:4}}>Fertigungsroute (SAP)</div><div style={{fontSize:11,color:'#cbd5e1'}}>Werk Bremerhaven · Linie A3 · Station ST-020</div></div>}
+            {bomType==='sBOM'&&<div style={{marginTop:12,padding:'10px 12px',borderRadius:8,background:'rgba(251,146,60,.08)',border:'1px solid rgba(251,146,60,.2)'}}><div style={{fontSize:9,fontWeight:800,color:'#fb923c',textTransform:'uppercase',marginBottom:4}}>Service-Info Offshore</div><div style={{fontSize:11,color:'#cbd5e1'}}>Ersatzteil-Nr.: {part.id.toUpperCase()}-SP · Vorlaufzeit: 72h CTW</div></div>}
+            {part.type==='software'&&<div style={{marginTop:12,padding:'10px 12px',borderRadius:8,background:'rgba(52,211,153,.06)',border:'1px solid rgba(52,211,153,.18)'}}><div style={{fontSize:9,fontWeight:800,color:'#34d399',textTransform:'uppercase',marginBottom:4}}>Software-Paket</div><div style={{fontSize:11,color:'#64748b',lineHeight:1.5}}>Lizenz · Versionierung via Git · CI/CD aktiv</div></div>}
           </div>
         )}
       </div>
@@ -1324,8 +1387,8 @@ function WindTurbine3D({containerRef}){
       scene.background=new T.Color(0xdde8f0);
       scene.fog=new T.FogExp2(0xccdde8,0.012);
 
-      const cam=new T.PerspectiveCamera(32,W/H,0.1,200);
-      cam.position.set(18,14,22);
+      const cam=new T.PerspectiveCamera(50,W/H,0.1,300);
+      cam.position.set(20,26,38);
 
       // Lighting
       scene.add(new T.AmbientLight(0xd0e8ff,0.6));
@@ -1339,7 +1402,7 @@ function WindTurbine3D({containerRef}){
       scene.add(new T.HemisphereLight(0x99ccff,0x667788,0.4));
 
       const ctrl=T.OrbitControls?new T.OrbitControls(cam,renderer.domElement):null;
-      if(ctrl){ctrl.enableDamping=true;ctrl.dampingFactor=0.05;ctrl.target.set(0,8,0);ctrl.minDistance=6;ctrl.maxDistance=60;ctrl.update();}
+      if(ctrl){ctrl.enableDamping=true;ctrl.dampingFactor=0.05;ctrl.target.set(0,14,0);ctrl.minDistance=6;ctrl.maxDistance=100;ctrl.update();}
 
       // Materials
       const mTower=new T.MeshStandardMaterial({color:0xd4dce4,metalness:0.2,roughness:0.6});
