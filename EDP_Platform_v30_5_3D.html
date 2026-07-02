@@ -604,34 +604,44 @@ const GOVERNANCE_DATA = {
 ═══════════════════════════════════════════════════════════════ */
 const RFLP = {
   requirements:[
-    {id:'req1',label:'Energieeffizienz A+++',desc:'EU-Norm 2024',params:[{name:'Verbrauch (kWh)',val:0.8,min:0.5,max:2.0,step:0.1}]},
-    {id:'req2',label:'Smart-Home Integration',desc:'Matter / Home Connect',params:[{name:'Latenz (ms)',val:200,min:50,max:1000,step:50}]},
-    {id:'req3',label:'Sicherheit EN 60335',desc:'Überhitzungsschutz',params:[{name:'Max Temp (°C)',val:55,min:40,max:80,step:5}]},
-    {id:'req4',label:'Fertigungskosten < 280 EUR',desc:'Target Cost',params:[{name:'Target (EUR)',val:280,min:200,max:400,step:10}]},
+    {id:'req1',label:'Nennleistung 3,0 MW',desc:'IEC 61400-1 Klasse IIA',params:[{name:'Leistung (MW)',val:3.0,min:1.5,max:5.0,step:0.5}]},
+    {id:'req2',label:'Windklasse IEC IIA',desc:'Mittlere Windgeschwindigkeit ≥ 8,5 m/s',params:[{name:'v_nenn (m/s)',val:12.5,min:8.0,max:25.0,step:0.5}]},
+    {id:'req3',label:'Verfügbarkeit ≥ 97 %',desc:'Technische Verfügbarkeit Offshore',params:[{name:'Verfügbarkeit (%)',val:97,min:90,max:100,step:1}]},
+    {id:'req4',label:'Design-Lebensdauer 25 Jahre',desc:'Offshore Fatigue Load IEC 61400-3',params:[{name:'Lebensdauer (a)',val:25,min:20,max:30,step:5}]},
+    {id:'req5',label:'Schallleistung ≤ 104 dB(A)',desc:'IEC 61400-11 Schallmessung',params:[{name:'LWA dB(A)',val:104,min:95,max:115,step:1}]},
+    {id:'req6',label:'LCOE < 50 EUR/MWh',desc:'Levelized Cost of Energy Offshore',params:[{name:'LCOE (EUR/MWh)',val:48,min:35,max:80,step:1}]},
   ],
   functions:[
-    {id:'fn1',label:'Thermische Regelung',desc:'PID-Regelkreis',params:[{name:'Leistung (W)',val:3500,min:2000,max:5000,step:100}]},
-    {id:'fn2',label:'Konnektivität',desc:'WLAN/BT',params:[{name:'Frequenz (GHz)',val:2.4,min:2.4,max:5.0,step:2.6}]},
-    {id:'fn3',label:'Sicherheitsabschaltung',desc:'Notabschaltung',params:[{name:'Schwelle (°C)',val:280,min:200,max:350,step:10}]},
-    {id:'fn4',label:'Benutzer-Interface',desc:'Display + Touch',params:[{name:'Display (Zoll)',val:3.5,min:2.0,max:7.0,step:0.5}]},
+    {id:'fn1',label:'Aerodynamische Energiewandlung',desc:'Betz-Koeffizient cp,max = 0,48',params:[{name:'Rotordurchmesser (m)',val:126,min:80,max:160,step:5}]},
+    {id:'fn2',label:'Pitchregelung',desc:'Individuelle Blattwinkelregelung',params:[{name:'Pitch-Rate (°/s)',val:8,min:4,max:15,step:1}]},
+    {id:'fn3',label:'Drehzahlregelung',desc:'MPPT + Sturmsicherung',params:[{name:'Nenn-Drehzahl (rpm)',val:14.3,min:8.0,max:20.0,step:0.5}]},
+    {id:'fn4',label:'Netzeinspeisung',desc:'LVRT / FRT konform',params:[{name:'Spannungsebene (kV)',val:33,min:11,max:66,step:11}]},
+    {id:'fn5',label:'Condition Monitoring (CMS)',desc:'Schwingung, Temperatur, Öl',params:[{name:'Abtastrate (Hz)',val:25600,min:1000,max:51200,step:1000}]},
+    {id:'fn6',label:'Yaw-Ausrichtung',desc:'Windnachführung Gondel',params:[{name:'Yaw-Rate (°/min)',val:0.5,min:0.2,max:2.0,step:0.1}]},
   ],
   logic:[
-    {id:'lg1',label:'Heizkreis-Modell',desc:'Sensorfusion',params:[{name:'Frequenz (Hz)',val:10,min:1,max:100,step:1}]},
-    {id:'lg2',label:'Kommunikations-Stack',desc:'MQTT/REST',params:[{name:'Buffer (KB)',val:64,min:16,max:512,step:16}]},
-    {id:'lg3',label:'Safety-Controller',desc:'SIL-2',params:[{name:'Watchdog (ms)',val:100,min:10,max:1000,step:10}]},
-    {id:'lg4',label:'UI-Controller',desc:'State-Machine',params:[{name:'fps',val:30,min:10,max:60,step:5}]},
+    {id:'lg1',label:'Turm-Strukturmodell',desc:'FEM-Ermüdungsanalyse',params:[{name:'Eigenfrequenz (Hz)',val:0.32,min:0.20,max:0.50,step:0.01}]},
+    {id:'lg2',label:'Triebstrang-Modell',desc:'Getriebe + Generator',params:[{name:'Übersetzung i',val:97.5,min:80,max:120,step:5}]},
+    {id:'lg3',label:'Blatt-Strukturmodell',desc:'GFK/CFK Verbund FEM',params:[{name:'Blattlänge (m)',val:63,min:40,max:80,step:5}]},
+    {id:'lg4',label:'SCADA / PLC',desc:'Redundante SPS, SIL-2',params:[{name:'Zykluszeit (ms)',val:10,min:1,max:100,step:1}]},
+    {id:'lg5',label:'Netzregler-Modell',desc:'VSC-Umrichter Steuerung',params:[{name:'Schaltfreq. (kHz)',val:2.5,min:1,max:10,step:0.5}]},
   ],
   physical:[
-    {id:'ph1',label:'Gehäuse-Chassis',desc:'Tiefzieh-Stahl',source:'factory',location:'Traunreut (GER)',cost:'35.50 EUR',risk:false},
-    {id:'ph2',label:'Hauptplatine PCB',desc:'SMD 4-lagig',source:'supplier',location:'Würth Elektronik',cost:'22.80 EUR',risk:false},
-    {id:'ph3',label:'WLAN Modul v4',desc:'Infineon CYW4373',source:'supplier',location:'Infineon (Single Source)',cost:'18.90 EUR',risk:true},
-    {id:'ph4',label:'Temperatursensor NTC',desc:'Murata NCP15',source:'supplier',location:'Murata',cost:'1.20 EUR',risk:false},
+    {id:'ph1',label:'Turmsektion Stahl (3-teilig)',desc:'S355 Stahl, Korrosionsschutz C5-M',source:'factory',location:'Anacon Rostock (GER)',cost:'820.000 EUR',risk:false},
+    {id:'ph2',label:'Rotorblatt GFK/CFK (× 3)',desc:'63 m, Resin Infusion Verfahren',source:'supplier',location:'SGL Carbon Wackersdorf',cost:'420.000 EUR',risk:false},
+    {id:'ph3',label:'PMSG Generator (Direktantrieb)',desc:'3 MW, permanentmagneterregter Synchrongenerator',source:'supplier',location:'Enercon Aurich (Single Source)',cost:'580.000 EUR',risk:true},
+    {id:'ph4',label:'Umrichter / Frequenzumformer',desc:'ABB PCS6000 3 MVA',source:'supplier',location:'ABB Turgi CH',cost:'190.000 EUR',risk:false},
+    {id:'ph5',label:'Gondel-Gehäuse GFK',desc:'Maschinenhaus Composite-Schale',source:'factory',location:'Anacon Bremerhaven',cost:'85.000 EUR',risk:false},
+    {id:'ph6',label:'Fundament Monopile Offshore',desc:'Stahl-Monopile ⌀ 8 m, 40 m tief',source:'supplier',location:'EEW Special Pipe (Single Source)',cost:'1.200.000 EUR',risk:true},
   ],
   edges:[
-    {from:'req1',to:'fn1'},{from:'req1',to:'fn3'},{from:'req2',to:'fn2'},{from:'req2',to:'fn4'},
-    {from:'req3',to:'fn3'},{from:'req4',to:'fn1'},
-    {from:'fn1',to:'lg1'},{from:'fn1',to:'lg3'},{from:'fn2',to:'lg2'},{from:'fn3',to:'lg3'},{from:'fn4',to:'lg4'},
-    {from:'lg1',to:'ph1'},{from:'lg2',to:'ph3'},{from:'lg3',to:'ph1'},{from:'lg4',to:'ph2'},
+    {from:'req1',to:'fn1'},{from:'req1',to:'fn3'},{from:'req2',to:'fn1'},{from:'req2',to:'fn2'},
+    {from:'req3',to:'fn5'},{from:'req3',to:'fn4'},{from:'req4',to:'lg1'},{from:'req4',to:'lg3'},
+    {from:'req5',to:'fn2'},{from:'req6',to:'fn1'},{from:'req6',to:'fn4'},
+    {from:'fn1',to:'lg3'},{from:'fn2',to:'lg3'},{from:'fn2',to:'lg4'},{from:'fn3',to:'lg2'},
+    {from:'fn4',to:'lg5'},{from:'fn5',to:'lg4'},{from:'fn6',to:'lg4'},
+    {from:'lg1',to:'ph1'},{from:'lg2',to:'ph3'},{from:'lg3',to:'ph2'},{from:'lg4',to:'ph4'},
+    {from:'lg5',to:'ph4'},{from:'lg1',to:'ph6'},
   ],
 };
 
@@ -645,17 +655,19 @@ const LAYERS=[
 /* ═══════════════════════════════════════════════════════════════
    PRODUKT BOM (für Digital Twin / Produkt-View)
 ═══════════════════════════════════════════════════════════════ */
-const PRODUCTS=[{id:'p1',brand:'Siemens',name:'iQ700 Waschmaschine WM14VMS0',release:'V5.1',devStatus:'Design Freeze',mfgStatus:'Serienfertigung',
-  model3d:'washing_machine',
-  specs:{capacity:'9 kg',rpm:'1400 U/min',energy:'A',noise:'49 dB',programs:16},
+const PRODUCTS=[{id:'p1',brand:'Anacon',name:'AW-3000 Offshore Windturbine',release:'V2.4',devStatus:'Design Freeze',mfgStatus:'Serienfertigung',
+  model3d:'wind_turbine',
+  specs:{capacity:'3,0 MW',rpm:'14,3 U/min',energy:'IEC IIA',noise:'104 dB(A)',programs:0},
   bom:[
-  {id:'b1',name:'Gehäuse-Chassis',icon:'box',layer:0,cost:'38.20 EUR',risk:false,supplier:'Eigenfertigung Traunreut',stage:'Freigegeben',progress:100},
-  {id:'b2',name:'Trommel (Edelstahl)',icon:'circle',layer:1,cost:'52.40 EUR',risk:false,supplier:'Thyssenkrupp Steel',stage:'Freigegeben',progress:100},
-  {id:'b3',name:'WLAN Modul v4',icon:'cpu',layer:2,cost:'18.90 EUR',risk:true,supplier:'Infineon Regensburg',stage:'Firmware Integration',progress:88},
-  {id:'b4',name:'Hauptplatine',icon:'cpu',layer:1,cost:'24.60 EUR',risk:false,supplier:'Würth Elektronik',stage:'Freigegeben',progress:100},
-  {id:'b5',name:'TFT Display 3.5"',icon:'monitor',layer:3,cost:'14.40 EUR',risk:false,supplier:'Raystar Optronics',stage:'Freigegeben',progress:100},
-  {id:'b6',name:'Laugenpumpe',icon:'droplets',layer:1,cost:'11.80 EUR',risk:false,supplier:'Fluid-o-Tech',stage:'Freigegeben',progress:100},
-  {id:'b7',name:'Türdichtung (EPDM)',icon:'circle-dashed',layer:0,cost:'6.30 EUR',risk:false,supplier:'Freudenberg Sealing',stage:'Freigegeben',progress:100},
+  {id:'b1',name:'Turm-Stahlkonstruktion (3-skt.)',icon:'box',layer:0,cost:'820.000 EUR',risk:false,supplier:'Anacon Rostock',stage:'Freigegeben',progress:100},
+  {id:'b2',name:'Rotorblatt GFK/CFK (× 3)',icon:'wind',layer:1,cost:'420.000 EUR',risk:false,supplier:'SGL Carbon Wackersdorf',stage:'Freigegeben',progress:100},
+  {id:'b3',name:'PMSG Generator 3 MW',icon:'cpu',layer:2,cost:'580.000 EUR',risk:true,supplier:'Enercon Aurich',stage:'Serienabnahme',progress:94},
+  {id:'b4',name:'Hauptlager SKF (× 2)',icon:'circle',layer:1,cost:'48.000 EUR',risk:false,supplier:'SKF Gothenburg',stage:'Freigegeben',progress:100},
+  {id:'b5',name:'Umrichter ABB PCS6000',icon:'zap',layer:1,cost:'190.000 EUR',risk:false,supplier:'ABB Turgi CH',stage:'Freigegeben',progress:100},
+  {id:'b6',name:'Pitch-Antrieb (× 3)',icon:'rotate-cw',layer:2,cost:'54.000 EUR',risk:false,supplier:'Liebherr Components',stage:'Freigegeben',progress:100},
+  {id:'b7',name:'Fundament Monopile Offshore',icon:'anchor',layer:0,cost:'1.200.000 EUR',risk:true,supplier:'EEW Special Pipe',stage:'Freigegeben',progress:100},
+  {id:'b8',name:'SCADA / Steuerung',icon:'monitor',layer:3,cost:'32.000 EUR',risk:false,supplier:'Beckhoff Automation',stage:'Softwaretest',progress:88},
+  {id:'b9',name:'Gondel-Gehäuse GFK',icon:'home',layer:0,cost:'85.000 EUR',risk:false,supplier:'Anacon Bremerhaven',stage:'Freigegeben',progress:100},
 ]}];
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1288,130 +1300,168 @@ function CostCtrlView({project,addLog}){return(
   </GenericView>
 );}
 
-function WashingMachine3D({containerRef}){
+function WindTurbine3D({containerRef}){
   useEffect(()=>{
     let running=false, renderer=null, ro=null, tid=null;
     function init(){
       const c=containerRef.current;
       if(!c||!window.THREE)return;
       const T=window.THREE;
-      const W=c.offsetWidth||500, H=c.offsetHeight||380;
+      const W=c.offsetWidth||600, H=c.offsetHeight||420;
 
       renderer=new T.WebGLRenderer({antialias:true,alpha:false});
       renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-      renderer.setClearColor(0xf8fafc,1);
+      renderer.setClearColor(0xdde8f0,1);
       renderer.shadowMap.enabled=true;
       renderer.shadowMap.type=T.PCFSoftShadowMap;
       renderer.toneMapping=T.ACESFilmicToneMapping;
-      renderer.toneMappingExposure=1.2;
+      renderer.toneMappingExposure=1.1;
       renderer.setSize(W,H);
       renderer.domElement.style.cssText='display:block;width:100%;height:100%;';
       c.appendChild(renderer.domElement);
 
       const scene=new T.Scene();
-      scene.background=new T.Color(0xf8fafc);
+      scene.background=new T.Color(0xdde8f0);
+      scene.fog=new T.FogExp2(0xccdde8,0.012);
 
-      const cam=new T.PerspectiveCamera(36,W/H,0.05,30);
-      cam.position.set(1.3,1.05,1.9);
+      const cam=new T.PerspectiveCamera(32,W/H,0.1,200);
+      cam.position.set(18,14,22);
 
-      scene.add(new T.AmbientLight(0xffffff,0.4));
-      const key=new T.DirectionalLight(0xfff4e8,2.5);
-      key.position.set(-2,5,3); key.castShadow=true;
-      key.shadow.mapSize.width=1024; key.shadow.mapSize.height=1024;
-      key.shadow.bias=-0.0005;
-      scene.add(key);
-      scene.add(Object.assign(new T.DirectionalLight(0xc8e0ff,0.9),{position:new T.Vector3(3,1,-1)}));
-      scene.add(Object.assign(new T.DirectionalLight(0x6699cc,1.0),{position:new T.Vector3(-1,1.5,-3)}));
-      scene.add(new T.HemisphereLight(0xd0e8ff,0xc8d0d8,0.6));
-      const drumPt=new T.PointLight(0x4499ff,2.2,0.55); drumPt.position.set(0,0.45,0.22); scene.add(drumPt);
+      // Lighting
+      scene.add(new T.AmbientLight(0xd0e8ff,0.6));
+      const sun=new T.DirectionalLight(0xfff8e8,2.2);
+      sun.position.set(-30,80,40); sun.castShadow=true;
+      sun.shadow.mapSize.width=2048; sun.shadow.mapSize.height=2048;
+      sun.shadow.camera.left=-30; sun.shadow.camera.right=30;
+      sun.shadow.camera.top=60; sun.shadow.camera.bottom=-5;
+      sun.shadow.bias=-0.001; scene.add(sun);
+      scene.add(Object.assign(new T.DirectionalLight(0x88bbff,0.5),{position:new T.Vector3(20,10,-15)}));
+      scene.add(new T.HemisphereLight(0x99ccff,0x667788,0.4));
 
       const ctrl=T.OrbitControls?new T.OrbitControls(cam,renderer.domElement):null;
-      if(ctrl){ctrl.enableDamping=true;ctrl.dampingFactor=0.06;ctrl.target.set(0,0.45,0);ctrl.minDistance=0.55;ctrl.maxDistance=4;ctrl.update();}
+      if(ctrl){ctrl.enableDamping=true;ctrl.dampingFactor=0.05;ctrl.target.set(0,8,0);ctrl.minDistance=6;ctrl.maxDistance=60;ctrl.update();}
 
-      const mWhite =new T.MeshStandardMaterial({color:0xf4f6f9,metalness:0.0,roughness:0.06});
-      const mWhite2=new T.MeshStandardMaterial({color:0xeaedf2,metalness:0.0,roughness:0.12});
-      const mGray  =new T.MeshStandardMaterial({color:0x303848,metalness:0.08,roughness:0.55});
-      const mDark  =new T.MeshStandardMaterial({color:0x0a0e16,metalness:0.04,roughness:0.80});
-      const mChrome=new T.MeshStandardMaterial({color:0xd0e0ec,metalness:0.96,roughness:0.06});
-      const mDrum  =new T.MeshStandardMaterial({color:0x8faec0,metalness:0.88,roughness:0.12,side:T.DoubleSide});
-      const mGlass =new T.MeshStandardMaterial({color:0x8ec8ff,metalness:0.05,roughness:0.02,transparent:true,opacity:0.22,side:T.DoubleSide});
-      const mBlue  =new T.MeshStandardMaterial({color:0x1a40c0,metalness:0.18,roughness:0.35,emissive:0x0a1a60,emissiveIntensity:0.3});
-      const mRubber=new T.MeshStandardMaterial({color:0x0e1218,metalness:0.0,roughness:0.96});
-      const mLED   =new T.MeshStandardMaterial({color:0x34d399,emissive:0x34d399,emissiveIntensity:1.5,roughness:0.4,metalness:0});
-      const mDisp  =new T.MeshStandardMaterial({color:0x1e3a8a,emissive:0x3b82f6,emissiveIntensity:0.7,roughness:0.5});
-      const mFloor =new T.MeshStandardMaterial({color:0xe8edf3,metalness:0.04,roughness:0.80});
+      // Materials
+      const mTower=new T.MeshStandardMaterial({color:0xd4dce4,metalness:0.2,roughness:0.6});
+      const mNacelle=new T.MeshStandardMaterial({color:0xf0f4f8,metalness:0.1,roughness:0.4});
+      const mBlade=new T.MeshStandardMaterial({color:0xe8eff5,metalness:0.0,roughness:0.3,side:T.DoubleSide});
+      const mHub=new T.MeshStandardMaterial({color:0xc8d4de,metalness:0.4,roughness:0.5});
+      const mSea=new T.MeshStandardMaterial({color:0x3a7fbc,metalness:0.05,roughness:0.7,transparent:true,opacity:0.85});
+      const mMono=new T.MeshStandardMaterial({color:0x8a9aaa,metalness:0.5,roughness:0.4});
+      const mAccent=new T.MeshStandardMaterial({color:0x1a4fa0,metalness:0.3,roughness:0.5});
+      const mLight=new T.MeshStandardMaterial({color:0xff4444,emissive:0xff2200,emissiveIntensity:2.0,roughness:0.3});
 
-      const grp=new T.Group();
-      const floor=new T.Mesh(new T.PlaneGeometry(8,8),mFloor);
-      floor.rotation.x=-Math.PI/2; floor.receiveShadow=true; scene.add(floor);
-      const grid=new T.GridHelper(5,50,0xc8d4e0,0xdce4ec); grid.position.y=0.001; scene.add(grid);
+      // Sea surface
+      const sea=new T.Mesh(new T.PlaneGeometry(120,120,20,20),mSea);
+      sea.rotation.x=-Math.PI/2; sea.position.y=-0.5; sea.receiveShadow=true; scene.add(sea);
 
-      const body=new T.Mesh(new T.BoxGeometry(0.600,0.850,0.560),mWhite);
-      body.position.set(0,0.425,0); body.castShadow=true; body.receiveShadow=true; grp.add(body);
-      grp.add(Object.assign(new T.Mesh(new T.BoxGeometry(0.600,0.090,0.560),mGray),{position:new T.Vector3(0,0.895,0),castShadow:true}));
-      grp.add(Object.assign(new T.Mesh(new T.BoxGeometry(0.590,0.072,0.012),mDark),{position:new T.Vector3(0,0.896,0.280)}));
-      grp.add(Object.assign(new T.Mesh(new T.BoxGeometry(0.215,0.044,0.006),mDark),{position:new T.Vector3(-0.055,0.897,0.283)}));
-      grp.add(Object.assign(new T.Mesh(new T.BoxGeometry(0.200,0.038,0.003),mDisp),{position:new T.Vector3(-0.055,0.897,0.284)}));
-      const ledBar=new T.Mesh(new T.BoxGeometry(0.170,0.005,0.003),mLED);
-      ledBar.position.set(-0.055,0.909,0.284); grp.add(ledBar);
-      const knobBezel=new T.Mesh(new T.CylinderGeometry(0.036,0.036,0.008,32),mChrome);
-      knobBezel.rotation.x=Math.PI/2; knobBezel.position.set(0.200,0.897,0.282); grp.add(knobBezel);
-      const knobCenter=new T.Mesh(new T.CylinderGeometry(0.026,0.026,0.008,24),mBlue);
-      knobCenter.rotation.x=Math.PI/2; knobCenter.position.set(0.200,0.897,0.283); grp.add(knobCenter);
-      grp.add(Object.assign(new T.Mesh(new T.BoxGeometry(0.003,0.018,0.003),new T.MeshStandardMaterial({color:0xffffff,emissive:0xffffff,emissiveIntensity:0.8})),{position:new T.Vector3(0.200,0.914,0.284)}));
-      const pwBtn=new T.Mesh(new T.CylinderGeometry(0.013,0.013,0.007,20),mBlue);
-      pwBtn.rotation.x=Math.PI/2; pwBtn.position.set(0.228,0.868,0.283); grp.add(pwBtn);
-      grp.add(Object.assign(new T.Mesh(new T.SphereGeometry(0.004,8,8),mLED),{position:new T.Vector3(0.228,0.868,0.287)}));
-      grp.add(Object.assign(new T.Mesh(new T.BoxGeometry(0.150,0.040,0.094),mWhite2),{position:new T.Vector3(0.180,0.800,0.281)}));
-      grp.add(Object.assign(new T.Mesh(new T.BoxGeometry(0.140,0.009,0.005),mBlue),{position:new T.Vector3(0.180,0.793,0.285)}));
-      const seal=new T.Mesh(new T.TorusGeometry(0.188,0.025,20,64),mRubber);
-      seal.rotation.x=Math.PI/2; seal.position.set(0,0.45,0.276); seal.castShadow=true; grp.add(seal);
-      const dring=new T.Mesh(new T.TorusGeometry(0.194,0.010,14,64),mChrome);
-      dring.rotation.x=Math.PI/2; dring.position.set(0,0.45,0.279); grp.add(dring);
-      grp.add(Object.assign(new T.Mesh(new T.CircleGeometry(0.175,64),mGlass),{position:new T.Vector3(0,0.45,0.281)}));
-      const innerRing=new T.Mesh(new T.TorusGeometry(0.178,0.005,10,48),mChrome);
-      innerRing.rotation.x=Math.PI/2; innerRing.position.set(0,0.45,0.282); grp.add(innerRing);
-      const hbar=new T.Mesh(new T.CylinderGeometry(0.011,0.011,0.100,16),mChrome);
-      hbar.rotation.z=Math.PI/2; hbar.position.set(0.184,0.45,0.290); hbar.castShadow=true; grp.add(hbar);
-      for(const hx of [-0.044,0.044]){grp.add(Object.assign(new T.Mesh(new T.SphereGeometry(0.012,12,10),mChrome),{position:new T.Vector3(0.184+hx,0.45,0.290)}));}
-      const drum=new T.Mesh(new T.CylinderGeometry(0.150,0.150,0.300,48,1,true),mDrum);
-      drum.rotation.x=Math.PI/2; drum.position.set(0,0.45,0.115); grp.add(drum);
-      const drumBack=new T.Mesh(new T.CircleGeometry(0.148,48),mDrum);
-      drumBack.rotation.x=Math.PI/2; drumBack.position.set(0,0.45,-0.036); grp.add(drumBack);
+      // Monopile foundation (underwater + above)
+      const monopile=new T.Mesh(new T.CylinderGeometry(0.9,1.0,28,24),mMono);
+      monopile.position.set(0,-14,0); monopile.castShadow=true; scene.add(monopile);
+
+      // Transition piece
+      const trans=new T.Mesh(new T.CylinderGeometry(1.1,0.9,2.5,24),mAccent);
+      trans.position.set(0,0.75,0); scene.add(trans);
+
+      // Tower (3 sections, tapering)
+      const tower=new T.Mesh(new T.CylinderGeometry(0.85,1.05,18,24),mTower);
+      tower.position.set(0,10,0); tower.castShadow=true; tower.receiveShadow=true; scene.add(tower);
+      const towerMid=new T.Mesh(new T.CylinderGeometry(0.70,0.85,8,24),mTower);
+      towerMid.position.set(0,23,0); towerMid.castShadow=true; scene.add(towerMid);
+      const towerTop=new T.Mesh(new T.CylinderGeometry(0.55,0.70,4,20),mTower);
+      towerTop.position.set(0,29,0); scene.add(towerTop);
+
+      // Tower door + platform ring
+      const door=new T.Mesh(new T.BoxGeometry(0.4,0.8,0.1),mAccent);
+      door.position.set(0,1.4,1.05); scene.add(door);
+      const platform=new T.Mesh(new T.CylinderGeometry(1.8,1.8,0.15,32),mMono);
+      platform.position.set(0,2.3,0); scene.add(platform);
+
+      // Nacelle (gondola)
+      const nacelle=new T.Mesh(new T.BoxGeometry(5.5,2.8,2.4),mNacelle);
+      nacelle.position.set(-0.8,32.0,0); nacelle.castShadow=true; scene.add(nacelle);
+      // Nacelle nose cone
+      const noseCone=new T.Mesh(new T.ConeGeometry(1.0,1.8,16),mNacelle);
+      noseCone.rotation.z=-Math.PI/2; noseCone.position.set(2.1,32.0,0); scene.add(noseCone);
+      // Nacelle back vent
+      const vent=new T.Mesh(new T.BoxGeometry(0.6,0.6,0.2),mAccent);
+      vent.position.set(-3.6,32.4,0); scene.add(vent);
+      // Crane/service hatch
+      const hatch=new T.Mesh(new T.BoxGeometry(0.8,0.8,0.15),mMono);
+      hatch.position.set(0,33.4,0); scene.add(hatch);
+      // Aviation warning light
+      const avLight=new T.Mesh(new T.SphereGeometry(0.2,8,8),mLight);
+      avLight.position.set(0,33.9,0); scene.add(avLight);
+
+      // Hub
+      const hub=new T.Mesh(new T.SphereGeometry(1.25,20,20),mHub);
+      hub.position.set(2.2,32.0,0); scene.add(hub);
+
+      // Rotor group (3 blades)
+      const rotorGrp=new T.Group();
+      rotorGrp.position.set(2.2,32.0,0);
+
+      function makeBlade(){
+        const bladeGrp=new T.Group();
+        // Main blade profile - tapered and twisted
+        for(let i=0;i<8;i++){
+          const t2=i/7;
+          const w=1.8*(1-t2*0.75)+0.3;
+          const seg=new T.Mesh(new T.BoxGeometry(w,8.5,0.18-t2*0.12),mBlade);
+          seg.position.set(0,7+i*7.8,0);
+          seg.rotation.y=t2*0.25;
+          seg.castShadow=true;
+          bladeGrp.add(seg);
+        }
+        // Blade tip
+        const tip=new T.Mesh(new T.ConeGeometry(0.25,2.5,8),mBlade);
+        tip.position.set(0,70,0); bladeGrp.add(tip);
+        // Leading edge stripe (Anacon blue)
+        const stripe=new T.Mesh(new T.BoxGeometry(0.12,60,0.05),new T.MeshStandardMaterial({color:0x1a4fa0,metalness:0.1,roughness:0.5}));
+        stripe.position.set(-0.8,35,0.12); bladeGrp.add(stripe);
+        return bladeGrp;
+      }
+
       for(let i=0;i<3;i++){
-        const a=(i/3)*Math.PI*2;
-        const bf=new T.Mesh(new T.BoxGeometry(0.016,0.260,0.012),new T.MeshStandardMaterial({color:0x8faec0,metalness:0.82,roughness:0.18}));
-        bf.rotation.x=Math.PI/2; bf.rotation.z=a; bf.position.set(Math.cos(a)*0.096,0.45+Math.sin(a)*0.096,0.115); grp.add(bf);
+        const b=makeBlade();
+        b.rotation.z=(i/3)*Math.PI*2;
+        rotorGrp.add(b);
       }
-      for(let r=0;r<3;r++) for(let c2=0;c2<12;c2++){
-        const a=(c2/12)*Math.PI*2, rad=0.052+r*0.036;
-        const hole=new T.Mesh(new T.CircleGeometry(0.0058,6),mDark);
-        hole.position.set(Math.cos(a)*rad,0.45+Math.sin(a)*rad,0.268); grp.add(hole);
-      }
-      grp.add(Object.assign(new T.Mesh(new T.BoxGeometry(0.600,0.036,0.560),mGray),{position:new T.Vector3(0,0.018,0),castShadow:true}));
-      const flt=new T.Mesh(new T.CylinderGeometry(0.022,0.022,0.005,16),mBlue);
-      flt.rotation.x=Math.PI/2; flt.position.set(-0.20,0.001,0.280); grp.add(flt);
-      const fltRing=new T.Mesh(new T.TorusGeometry(0.022,0.003,6,16),mChrome);
-      fltRing.rotation.x=Math.PI/2; fltRing.position.set(-0.20,0.001,0.281); grp.add(fltRing);
-      for(const[fx,fz] of [[-0.228,-0.220],[0.228,-0.220],[-0.228,0.220],[0.228,0.220]]){
-        const ft=new T.Mesh(new T.CylinderGeometry(0.019,0.023,0.034,12),mRubber);
-        ft.position.set(fx,-0.017,fz); ft.castShadow=true; grp.add(ft);
-        grp.add(Object.assign(new T.Mesh(new T.TorusGeometry(0.020,0.003,6,16),mChrome),{position:new T.Vector3(fx,0.001,fz)}));
-      }
-      scene.add(grp);
+      scene.add(rotorGrp);
+
+      // Spinner cap on hub
+      const spinner=new T.Mesh(new T.ConeGeometry(0.8,1.5,16),mHub);
+      spinner.rotation.z=-Math.PI/2; spinner.position.set(3.5,32.0,0); scene.add(spinner);
+
+      // Cable/J-tube on monopile
+      const jtube=new T.Mesh(new T.CylinderGeometry(0.12,0.12,12,8),mAccent);
+      jtube.position.set(1.0,-6,0); scene.add(jtube);
+
+      // Seabed (sandy bottom)
+      const seabed=new T.Mesh(new T.PlaneGeometry(80,80),new T.MeshStandardMaterial({color:0xc4a96a,roughness:0.9}));
+      seabed.rotation.x=-Math.PI/2; seabed.position.y=-28; scene.add(seabed);
+
+      // Point light for rotor glow
+      const rotorPt=new T.PointLight(0x4499ff,0.8,12); rotorPt.position.set(2.5,32,0); scene.add(rotorPt);
 
       running=true; let t=0;
       ro=new ResizeObserver(()=>{
         const w=c.offsetWidth,h=c.offsetHeight;
         if(w>0&&h>0){renderer.setSize(w,h);cam.aspect=w/h;cam.updateProjectionMatrix();}
       }); ro.observe(c);
+
       const loop=()=>{
         if(!running)return;
         requestAnimationFrame(loop);
-        t+=0.0035;
-        grp.rotation.y=Math.sin(t)*0.14;
-        drumPt.intensity=1.8+Math.sin(t*2.8)*0.4;
-        ledBar.material.emissiveIntensity=1.2+Math.sin(t*4)*0.3;
+        t+=0.008;
+        // Rotate rotor
+        rotorGrp.rotation.x=t*0.7;
+        // Subtle hub wobble (wind loading effect)
+        rotorGrp.position.x=2.2+Math.sin(t*0.3)*0.05;
+        // Aviation light pulsing
+        avLight.material.emissiveIntensity=1.5+Math.sin(t*2)*1.0;
+        // Sea surface gentle wave (move UVs - approximate with position)
+        sea.rotation.z=Math.sin(t*0.1)*0.002;
         if(ctrl)ctrl.update();
         renderer.render(scene,cam);
       }; loop();
@@ -1424,17 +1474,17 @@ function WashingMachine3D({containerRef}){
 
 /* ─── Assembly Groups & Parts Database ───────────────────────────────────── */
 const PART_GROUPS_META=[
-  {id:'gehaeuse',    name:'Gehäuse',            col:'#60a5fa', count:120,  totalCost:  892.40},
-  {id:'tuer',        name:'Tür-Baugruppe',       col:'#a78bfa', count: 90,  totalCost:  418.60},
-  {id:'trommel',     name:'Trommel-Baugruppe',   col:'#34d399', count:160,  totalCost: 1240.80},
-  {id:'antrieb',     name:'Antrieb & Motor',     col:'#fbbf24', count:110,  totalCost:  864.50},
-  {id:'wasser',      name:'Wasserführung',        col:'#38bdf8', count: 70,  totalCost:  312.90},
-  {id:'heizung',     name:'Heizelement',          col:'#f87171', count: 18,  totalCost:   98.40},
-  {id:'aufhaengung', name:'Aufhängung',           col:'#fb923c', count: 80,  totalCost:  224.70},
-  {id:'elektronik',  name:'Elektronik & PCB',    col:'#c084fc', count:550,  totalCost:  748.20},
-  {id:'schublade',   name:'Waschmittelschublade', col:'#4ade80', count: 40,  totalCost:   62.30},
-  {id:'kabelbaum',   name:'Kabelbaum',            col:'#94a3b8', count:500,  totalCost:  184.60},
-  {id:'befestigung', name:'Befestigungsmittel',   col:'#64748b', count:8312, totalCost:  482.10},
+  {id:'turm',        name:'Turm & Fundament',       col:'#60a5fa', count:280,  totalCost: 2180000},
+  {id:'rotor',       name:'Rotor-Nabe',              col:'#a78bfa', count: 95,  totalCost:   92000},
+  {id:'blaetter',    name:'Rotorblätter (× 3)',      col:'#34d399', count:210,  totalCost:  420000},
+  {id:'generator',   name:'Generator & Antrieb',     col:'#fbbf24', count:180,  totalCost:  628000},
+  {id:'pitch',       name:'Pitch-System',            col:'#38bdf8', count:145,  totalCost:   54000},
+  {id:'yaw',         name:'Yaw-System',              col:'#fb923c', count: 88,  totalCost:   38500},
+  {id:'gondel',      name:'Gondelgehäuse',           col:'#f87171', count:165,  totalCost:   85000},
+  {id:'umrichter',   name:'Umrichter & Elektrik',    col:'#c084fc', count:420,  totalCost:  190000},
+  {id:'scada',       name:'SCADA & Steuerung',       col:'#4ade80', count:310,  totalCost:   32000},
+  {id:'kabel',       name:'Kabelanlage Offshore',    col:'#94a3b8', count:185,  totalCost:   48000},
+  {id:'befestigung', name:'Schrauben & Verbinder',   col:'#64748b', count:7922, totalCost:   28000},
 ];
 const TOTAL_PARTS=PART_GROUPS_META.reduce((s,g)=>s+g.count,0);
 const TOTAL_COST=PART_GROUPS_META.reduce((s,g)=>s+g.totalCost,0);
@@ -1795,14 +1845,14 @@ function DigitalTwinView({project,addLog}){
       {/* ── 3D Viewer (mitte) ── */}
       <div className="gc" style={{flex:'0 0 48%',position:'relative',background:'#f8fafc',borderRadius:14,overflow:'hidden',minHeight:320}}>
         <div ref={containerRef} style={{display:cadFile?'none':'block',position:'absolute',inset:0,background:'#f8fafc'}}/>
-        {!cadFile&&<WashingMachine3D containerRef={containerRef}/>}
+        {!cadFile&&<WindTurbine3D containerRef={containerRef}/>}
         <div ref={ovContRef} style={{display:cadFile?'block':'none',width:'100%',height:'100%',position:'absolute',inset:0}}/>
         {!cadFile&&<>
           <div style={{position:'absolute',top:8,left:10,pointerEvents:'none'}}>
             <div style={{fontSize:7,fontWeight:900,color:'#334155',textTransform:'uppercase',letterSpacing:1.5}}>Live 3D · Orbit mit Maus</div>
           </div>
           <div style={{position:'absolute',bottom:42,left:10,display:'flex',gap:6,pointerEvents:'none'}}>
-            {[['Kapazität',product.specs.capacity],['Drehzahl',product.specs.rpm],['Energie',product.specs.energy]].map(([k,v])=>(
+            {[['Nennleistung',product.specs.capacity],['Drehzahl',product.specs.rpm],['Zertifizierung',product.specs.energy]].map(([k,v])=>(
               <div key={k} style={{background:'rgba(255,255,255,.85)',border:'1px solid #cbd5e1',borderRadius:6,padding:'3px 7px'}}>
                 <div style={{fontSize:7,color:'#64748b',textTransform:'uppercase'}}>{k}</div>
                 <div style={{fontSize:10,fontWeight:800,color:'#0f172a'}}>{v}</div>
