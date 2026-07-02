@@ -1495,245 +1495,249 @@ function buildGroupParts(gid){
   function mk(nm,type,mat,cost,sup,stage,prog,risk,dims,wt){
     seq++;
     parts.push({
-      id:`BSH-WM-${gid.slice(0,3).toUpperCase()}-${String(seq).padStart(4,'0')}`,
+      id:`ANA-WT-${gid.slice(0,3).toUpperCase()}-${String(seq).padStart(4,'0')}`,
       name:nm, type, mat, cost:`${cost} EUR`, sup, stage,
       prog: typeof prog==='number'?prog:100,
       risk:!!risk, dims, wt:`${wt} kg`
     });
   }
-  /* ── Gehäuse ── */
-  if(gid==='gehaeuse'){
-    const panels=[['Panel Oben','600×560×25 mm','2.10'],['Panel Unten','600×560×20 mm','1.95'],['Panel Links','25×560×900 mm','3.20'],['Panel Rechts','25×560×900 mm','3.20'],['Panel Rückseite','600×20×900 mm','4.10'],['Sockelblende','600×560×80 mm','1.80']];
-    panels.forEach(([n,d,w])=>mk(n,'Kaufteil','Stahlblech DC01 0.8mm','28.40','ThyssenKrupp',  'Freigegeben',100,0,d,w));
-    for(let i=1;i<=12;i++) mk(`Rahmenprofil_${String(i).padStart(2,'0')}`,'Kaufteil','Stahlrohr 20×20×1.5mm','12.60','SSAB','Freigegeben',100,0,'900mm L','0.85');
-    for(let i=1;i<=4;i++) mk(`Nivellierfuß_${i}`,'Kaufteil','PA66 GF30','4.20','Freudenberg','Freigegeben',100,0,'Ø50×60mm','0.12');
-    for(let i=1;i<=4;i++) mk(`Fuss_Gummimatte_${i}`,'Kaufteil','EPDM','1.80','Freudenberg','Freigegeben',100,0,'Ø56×8mm','0.04');
-    for(let i=1;i<=4;i++) mk(`Fuss_Kontermutter_${i}`,'Normteil','Stahl verz.','0.40','Würth','Freigegeben',100,0,'M14','0.02');
-    mk('Türausschnitt-Verstärkungsring','Kaufteil','Stahlblech DC04 1.2mm','18.90','ThyssenKrupp','Freigegeben',100,0,'Ø430mm','1.40');
-    for(let i=1;i<=30;i++) mk(`Kabelclip_Gehäuse_${String(i).padStart(2,'0')}`,'Kaufteil','PP','0.08','Richco','Freigegeben',100,0,'18×8×12mm','0.003');
-    for(let i=1;i<=20;i++) mk(`Haltewinkel_${String(i).padStart(2,'0')}`,'Eigenteil','Stahlblech DC01','1.20','Eigenfertigung Traunreut','Freigegeben',100,0,'30×30×5mm','0.06');
+  /* ── Turm & Fundament ── */
+  if(gid==='turm'){
+    mk('Turmsektion 1 (unten, S355J2+N)','Eigenteil','Stahl S355J2+N 30mm','280000','Anacon Rostock','Freigegeben',100,0,'Ø5500/4800mm H=30m','98000');
+    mk('Turmsektion 2 (mitte)','Eigenteil','Stahl S355J2+N 25mm','210000','Anacon Rostock','Freigegeben',100,0,'Ø4800/4200mm H=25m','72000');
+    mk('Turmsektion 3 (oben)','Eigenteil','Stahl S355J2+N 20mm','165000','Anacon Rostock','Freigegeben',100,0,'Ø4200/3400mm H=20m','54000');
+    mk('Flanschverbindung Sekt 1-2','Eigenteil','Stahl 42CrMo4 V','28000','Schuler Pressen','Freigegeben',100,0,'Ø5200×250mm','4800');
+    mk('Flanschverbindung Sekt 2-3','Eigenteil','Stahl 42CrMo4 V','24000','Schuler Pressen','Freigegeben',100,0,'Ø4600×220mm','3900');
+    mk('Turmflansch oben (Gondel-Anschluss)','Eigenteil','Stahl 42CrMo4 V','32000','Schuler Pressen','Freigegeben',100,0,'Ø3800×280mm','4200');
+    mk('Turmflansch unten (Transition Piece)','Eigenteil','Stahl 42CrMo4 V','38000','Schuler Pressen','Freigegeben',100,0,'Ø6000×320mm','6200');
+    mk('Monopile Stahl S355G10+M','Kaufteil','Stahl S355G10+M OTC','820000','EEW Special Pipe','Freigegeben',100,true,'Ø8000mm H=42m t=90mm','486000');
+    mk('Transition Piece Stahl','Eigenteil','Stahl S355J2+N','125000','Anacon Rostock','Freigegeben',100,0,'Ø8200/5800mm H=8m','58000');
+    mk('Grouting Verbundmörtel','Kaufteil','UltraductPlus CC-Grout','18000','Densit','Freigegeben',100,0,'Ringspalt 6m3','12000');
+    mk('J-Tube Stahlrohr DN400','Kaufteil','Stahl S235','4800','Vallourec','Freigegeben',100,0,'Ø406×12mm L=30m','1840');
+    mk('J-Tube Abweiser GFK','Kaufteil','GFK Epoxy-Laminat','1200','Senvion','Freigegeben',100,0,'Ø500×1200mm','62');
+    mk('Turmzugang Tür (Stahl+Schloss)','Kaufteil','Stahl S235 + Schloss','2400','Hörmann','Freigegeben',100,0,'800×1800mm','185');
+    mk('Innere Leiter (Turm, galv.)','Kaufteil','Stahl feuerverzinkt','3800','Layher','Freigegeben',100,0,'H=75m 400 Sprossen','820');
+    mk('Ruheplattform L1 (H=25m)','Eigenteil','Stahl S235 Gitterrost','4200','Gitterrosttechnik','Freigegeben',100,0,'Ø3400mm Ring','310');
+    mk('Ruheplattform L2 (H=50m)','Eigenteil','Stahl S235 Gitterrost','4200','Gitterrosttechnik','Freigegeben',100,0,'Ø3400mm Ring','310');
+    mk('Korrosionsschutz Turm innen','Kaufteil','Epoxidharz 2K C5-M','8400','Jotun Coatings','Freigegeben',100,0,'Schichtdicke 240µm','0');
+    mk('Korrosionsschutz Turm außen','Kaufteil','Zinkstaub-Epoxy + PU C5-M','22000','Jotun Coatings','Freigegeben',100,0,'Schichtdicke 320µm','0');
+    mk('Blitzschutz Turm (Stahl-Ring)','Kaufteil','Stahl C45 feuerverzinkt','2800','Dehn + Söhne','Freigegeben',100,0,'Ø5200mm Draht+Ableit.','42');
+    for(let i=1;i<=6;i++) mk(`Wartungsluke Deckel ${i}`,'Kaufteil','Stahl S235 + Dichtung','420','Hörmann','Freigegeben',100,0,'500×500mm','24');
+    for(let i=1;i<=12;i++) mk(`Kabelhalter Turm ${String(i).padStart(2,'0')}`,'Kaufteil','Stahl verz.','280','Stauff','Freigegeben',100,0,'Ø110mm Klemme','2.4');
+    for(let i=1;i<=8;i++) mk(`Kranöse Turm ${i}`,'Eigenteil','Stahl S460Q','1800','Anacon Rostock','Freigegeben',100,0,'SW80 M48','18');
+    for(let i=1;i<=16;i++) mk(`Fundamentanker M72 ${String(i).padStart(2,'0')}`,'Kaufteil','Stahl 10.9 feuerverzinkt','480','Peiner Umformtechnik','Freigegeben',100,0,'M72×3000mm','28');
+    for(let i=1;i<=3;i++) mk(`Opferanode Zinkblock ${i}`,'Kaufteil','Zink EN 12496','1800','Cathelco','Freigegeben',100,0,'600×300×150mm','60');
   }
-  /* ── Tür ── */
-  else if(gid==='tuer'){
-    mk('Tür Außenring','Kaufteil','Stahlblech DC01 0.8mm','22.40','Autoneum','Freigegeben',100,0,'Ø430mm','0.95');
-    mk('Tür Innenring','Kaufteil','Stahlblech DC01 0.6mm','18.60','Autoneum','Freigegeben',100,0,'Ø410mm','0.72');
-    mk('Türglas','Kaufteil','Sicherheitsglas ESG 4mm','14.80','Saint-Gobain','Freigegeben',100,0,'Ø360mm','1.10');
-    ['Links','Rechts'].forEach(s=>{
-      mk(`Scharnier ${s} Körper`,'Kaufteil','Zinkdruckguss','8.40','Kiekert','Freigegeben',100,0,'70×20×60mm','0.18');
-      mk(`Scharnier ${s} Bolzen`,'Normteil','Stahl C45','1.20','Würth','Freigegeben',100,0,'Ø10×80mm','0.06');
-      mk(`Scharnier ${s} Feder`,'Kaufteil','Federstahl','0.80','Gutekunst','Freigegeben',100,0,'Ø8×40mm','0.02');
-      mk(`Scharnier ${s} Scheibe 1`,'Normteil','Stahl verz.','0.10','Würth','Freigegeben',100,0,'Ø16×3mm','0.01');
-      mk(`Scharnier ${s} Scheibe 2`,'Normteil','Stahl verz.','0.10','Würth','Freigegeben',100,0,'Ø16×3mm','0.01');
-      mk(`Scharnier ${s} Platte`,'Eigenteil','Stahlblech DC01','4.20','Eigenfertigung Traunreut','Freigegeben',100,0,'80×15×50mm','0.12');
-      mk(`Scharnier ${s} Stopfen`,'Kaufteil','PE','0.20','Richco','Freigegeben',100,0,'Ø12×8mm','0.005');
-      mk(`Scharnier ${s} Clip`,'Kaufteil','PA66','0.15','Richco','Freigegeben',100,0,'10×6×14mm','0.004');
-    });
-    mk('Griff Körper','Kaufteil','ABS Chrom-optik','12.60','Rosti','Freigegeben',100,0,'140×22×30mm','0.28');
-    mk('Griff Innenhalter','Kaufteil','PP','2.40','Rosti','Freigegeben',100,0,'130×10×20mm','0.08');
-    mk('Griff Achse','Normteil','Stahl C45','1.10','Würth','Freigegeben',100,0,'Ø8×140mm','0.07');
-    mk('Griff Feder','Kaufteil','Federstahl','0.60','Gutekunst','Freigegeben',100,0,'Ø6×40mm','0.01');
-    mk('Griff Abdeckung','Kaufteil','ABS','3.80','Rosti','Freigegeben',100,0,'150×6×35mm','0.12');
-    mk('Türschloss Gehäuse','Kaufteil','PA66 GF15','6.40','Kiekert','Freigegeben',100,0,'60×30×80mm','0.14');
-    mk('Türschloss Haken','Kaufteil','Stahl geh.','2.20','Kiekert','Freigegeben',100,0,'20×15×35mm','0.04');
-    mk('Türschloss Feder','Kaufteil','Federstahl','0.40','Gutekunst','Freigegeben',100,0,'Ø8×30mm','0.008');
-    mk('Türschloss Magnet','Kaufteil','NdFeB','1.80','Arnold Magnetics','Freigegeben',100,0,'15×10×18mm','0.018');
-    mk('Türschloss Spule','Kaufteil','Cu-Lackdraht','2.60','Oswald','Freigegeben',100,0,'Ø16×20mm','0.06');
-    mk('Türschloss Anker','Kaufteil','Weicheisen','1.40','Vacuumschmelze','Freigegeben',100,0,'12×8×15mm','0.01');
-    mk('Türschloss Achse','Normteil','Stahl C45','0.60','Würth','Freigegeben',100,0,'Ø6×25mm','0.006');
-    mk('Türschloss Deckel','Kaufteil','PA66','2.80','Kiekert','Freigegeben',100,0,'65×12×85mm','0.09');
-    for(let i=1;i<=24;i++) mk(`Manschette Segment ${String(i).padStart(2,'0')}`,'Kaufteil','EPDM 60 Shore','3.20','Freudenberg Sealing','Freigegeben',100,0,'Sektor 15°','0.04');
-    mk('Manschette Spannring','Kaufteil','Federstahl','4.10','Gutekunst','Freigegeben',100,0,'Ø390mm','0.18');
-    mk('Manschette Klemmfeder','Kaufteil','Federstahl','2.80','Gutekunst','Freigegeben',100,0,'Ø376mm','0.12');
+  /* ── Rotor-Nabe ── */
+  else if(gid==='rotor'){
+    mk('Nabe Gusseisen EN-GJS-400-18','Eigenteil','GJS-400-18-LT Sphäroguss','42000','Siempelkamp','Freigegeben',100,0,'Ø3200mm 3-Arm','16800');
+    mk('Spinner GFK-Abdeckung','Eigenteil','GFK Epoxy Resin Infusion','8400','Anacon Bremerhaven','Freigegeben',100,0,'Ø3400mm','420');
+    mk('Spinner Tragrahmen Stahl','Eigenteil','Stahl S355','2800','Anacon Rostock','Freigegeben',100,0,'Ø3200mm','380');
+    mk('Hauptlager SKF 240/1250 BK30W33','Kaufteil','Stahl 100Cr6 präzision','24000','SKF Gothenburg','Freigegeben',100,0,'Ø1460/Ø1250×B=212mm','1120');
+    mk('Hauptlagergehäuse Stahl','Eigenteil','Stahl S355','18000','Anacon Rostock','Freigegeben',100,0,'Ø1800×L=850mm','3400');
+    mk('Hauptwelle (Schmiedelrohteil)','Eigenteil','Stahl 42CrMo4 V Schmiedestück','38000','Saarschmiede','Freigegeben',100,0,'Ø920/Ø600mm L=2800mm','8400');
+    mk('Wellendichtring Hauptlager LS','Kaufteil','SKF HDDF Radial-Wellendichtring','1800','SKF','Freigegeben',100,0,'Ø1260×Ø1190×W=46','8.4');
+    mk('Wellendichtring Hauptlager DS','Kaufteil','SKF HDDF Radial-Wellendichtring','1800','SKF','Freigegeben',100,0,'Ø1260×Ø1190×W=46','8.4');
+    mk('Naben-Rotorblatt-Flansch 1','Eigenteil','Stahl 42CrMo4 V','8400','Saarschmiede','Freigegeben',100,0,'Ø2340×H=180mm','1840');
+    mk('Naben-Rotorblatt-Flansch 2','Eigenteil','Stahl 42CrMo4 V','8400','Saarschmiede','Freigegeben',100,0,'Ø2340×H=180mm','1840');
+    mk('Naben-Rotorblatt-Flansch 3','Eigenteil','Stahl 42CrMo4 V','8400','Saarschmiede','Freigegeben',100,0,'Ø2340×H=180mm','1840');
+    mk('Blattlager 1 SKF 011.60.2240','Kaufteil','Stahl GCr15 Vierpunktlager','8800','SKF Gothenburg','Freigegeben',100,0,'Ø2280/Ø2060×H=100mm','1240');
+    mk('Blattlager 2 SKF 011.60.2240','Kaufteil','Stahl GCr15 Vierpunktlager','8800','SKF Gothenburg','Freigegeben',100,0,'Ø2280/Ø2060×H=100mm','1240');
+    mk('Blattlager 3 SKF 011.60.2240','Kaufteil','Stahl GCr15 Vierpunktlager','8800','SKF Gothenburg','Freigegeben',100,0,'Ø2280/Ø2060×H=100mm','1240');
+    mk('Öl-Befettungsanlage Nabe','Kaufteil','Beka-Max Progressiv-Verteiler','3200','Beka Lube','Freigegeben',100,0,'L=420mm','24');
+    mk('Hubsystem Spinner (Hydraulik)','Kaufteil','Parker Hydraulik-Zylinder 160kN','2800','Parker Hannifin','Freigegeben',100,0,'Ø125mm Hub=800mm','84');
+    for(let i=1;i<=12;i++) mk(`Serviceklappe Nabe ${String(i).padStart(2,'0')}`,'Kaufteil','GFK+Edelstahlrahmen','480','Anacon Bremerhaven','Freigegeben',100,0,'400×600mm','8.4');
+    for(let i=1;i<=6;i++) mk(`Blitzrezeptor Nabe ${i}`,'Kaufteil','Metallelement Cu/Stahl','840','Dehn + Söhne','Freigegeben',100,0,'Ø38mm H=120mm','0.42');
+    for(let i=1;i<=4;i++) mk(`Heizung Nabe ${i} (Anti-Icing)`,'Kaufteil','PTC-Heizfolie 500W','620','Backer GmbH','Freigegeben',100,0,'400×600mm 230V','1.8');
+    mk('Kamera Nabe (CMS-Überwachung)','Kaufteil','IP68 Kamera Wärmebildsensor','4200','Flir Systems','Freigegeben',100,0,'Ø80×L=140mm','0.62');
   }
-  /* ── Trommel ── */
-  else if(gid==='trommel'){
-    mk('Laugenbehälter Vorne','Eigenteil','PP UV-stabil','48.60','Eigenfertigung Traunreut','Freigegeben',100,0,'Ø480×480mm','3.20');
-    mk('Laugenbehälter Hinten','Eigenteil','PP UV-stabil','38.40','Eigenfertigung Traunreut','Freigegeben',100,0,'Ø480×20mm','1.10');
-    mk('Laugenbehälter Dichtung','Kaufteil','EPDM','5.40','Freudenberg Sealing','Freigegeben',100,0,'Ø470mm','0.08');
-    mk('Trommel Mantel','Eigenteil','Edelstahl 1.4301 0.8mm','82.40','ThyssenKrupp Nirosta','Freigegeben',100,0,'Ø420×440mm','4.80');
-    mk('Trommel Front','Eigenteil','Edelstahl 1.4301','24.60','ThyssenKrupp Nirosta','Freigegeben',100,0,'Ø416×12mm','1.20');
-    mk('Trommel Rückseite','Eigenteil','Edelstahl 1.4301','22.80','ThyssenKrupp Nirosta','Freigegeben',100,0,'Ø416×15mm','1.10');
-    for(let i=1;i<=3;i++){mk(`Mitnehmer ${i} Körper`,'Eigenteil','PP GF20','4.80','Eigenfertigung Traunreut','Freigegeben',100,0,'25×400×25mm','0.18');mk(`Mitnehmer ${i} Abdeckung`,'Eigenteil','PP','2.40','Eigenfertigung Traunreut','Freigegeben',100,0,'28×400×10mm','0.09');mk(`Mitnehmer ${i} Schraube 1`,'Normteil','Stahl A2','0.08','Würth','Freigegeben',100,0,'M4×12mm','0.003');mk(`Mitnehmer ${i} Schraube 2`,'Normteil','Stahl A2','0.08','Würth','Freigegeben',100,0,'M4×12mm','0.003');}
-    mk('Trommelwelle','Eigenteil','Stahl C60 geh.','28.40','Lüttgens & Mosler','Freigegeben',100,0,'Ø44×180mm','2.10');
-    mk('Trommel Flansch','Eigenteil','Grauguss GG-25','18.60','Eisengießerei Bochum','Freigegeben',100,0,'Ø160×18mm','1.40');
-    mk('Trommelwelle Keil','Normteil','Stahl C45','0.80','Würth','Freigegeben',100,0,'6×6×60mm','0.017');
-    mk('Spinne Nabe','Eigenteil','Zinkdruckguss','14.20','Druckguss Heidenheim','Freigegeben',100,0,'Ø80×30mm','0.62');
-    for(let i=1;i<=3;i++) mk(`Spinne Arm ${i}`,'Eigenteil','Zinkdruckguss','8.60','Druckguss Heidenheim','Freigegeben',100,0,'200×20×30mm','0.44');
-    ['Vorne','Hinten'].forEach(s=>{
-      mk(`Lager ${s} Außenring`,'Kaufteil','Stahl 100Cr6','8.40','Schaeffler FAG','Freigegeben',100,0,'Ø105×Ø72×25mm','0.28');
-      mk(`Lager ${s} Innenring`,'Kaufteil','Stahl 100Cr6','6.80','Schaeffler FAG','Freigegeben',100,0,'Ø72×Ø44×25mm','0.18');
-      mk(`Lager ${s} Käfig`,'Kaufteil','Messing','2.40','Schaeffler FAG','Freigegeben',100,0,'Ø82mm','0.04');
-      for(let k=1;k<=16;k++) mk(`Lager ${s} Kugel ${String(k).padStart(2,'0')}`,'Kaufteil','Stahl 100Cr6','0.40','Schaeffler FAG','Freigegeben',100,0,'Ø14mm','0.011');
-    });
-    mk('Wellendichtring Vorne','Kaufteil','NBR 70 Shore','3.20','Freudenberg Sealing','Freigegeben',100,0,'Ø56×Ø44×10mm','0.018');
-    mk('Wellendichtring Hinten','Kaufteil','NBR 70 Shore','3.20','Freudenberg Sealing','Freigegeben',100,0,'Ø56×Ø44×10mm','0.018');
-    for(let i=1;i<=3;i++){mk(`Gegengewicht ${i} Betonblock`,'Kaufteil','Spezialbeton','18.40','Liapor','Freigegeben',100,0,'400×60×300mm','4.80');for(let b=1;b<=4;b++){mk(`GG${i} Bolzen ${b}`,'Normteil','Stahl 8.8','0.28','Würth','Freigegeben',100,0,'M10×75mm','0.042');mk(`GG${i} Mutter ${b}`,'Normteil','Stahl 8.8','0.08','Würth','Freigegeben',100,0,'M10','0.010');mk(`GG${i} Scheibe ${b}`,'Normteil','Stahl verz.','0.04','Würth','Freigegeben',100,0,'Ø20×3mm','0.006');}}
-    mk('Lagergehäuse Vorne','Eigenteil','Aluminium AlSi9Cu3','22.60','Druckguss Heidenheim','Freigegeben',100,0,'120×30×120mm','0.86');
-    mk('Lagergehäuse Hinten','Eigenteil','Aluminium AlSi9Cu3','22.60','Druckguss Heidenheim','Freigegeben',100,0,'120×30×120mm','0.86');
-    for(let i=1;i<=50;i++) mk(`Trommel Lochgruppe ${String(i).padStart(2,'0')} (10 Loch)`,'Eigenteil','Edelstahl 1.4301','0.00','Eigenfertigung Traunreut','Freigegeben',100,0,'Ø6mm×10','0.001');
-  }
-  /* ── Antrieb & Motor ── */
-  else if(gid==='antrieb'){
-    mk('Motor Statorpaket','Kaufteil','Elektroblech M250-35A','48.40','Voestalpine','Freigegeben',100,0,'Ø176×180mm','4.20');
-    mk('Motor Rotor','Kaufteil','Elektroblech + Permanentmagnete','62.80','Vacuumschmelze','Freigegeben',100,0,'Ø144×170mm','2.80');
-    mk('Motor Welle','Eigenteil','Stahl C60 geh.','18.40','Lüttgens & Mosler','Freigegeben',100,0,'Ø24×220mm','0.80');
-    mk('Motor Gehäuse Vorne','Kaufteil','Aluminium AlSi9Cu3','22.60','Druckguss Heidenheim','Freigegeben',100,0,'Ø190×20mm','0.94');
-    mk('Motor Gehäuse Hinten','Kaufteil','Aluminium AlSi9Cu3','22.60','Druckguss Heidenheim','Freigegeben',100,0,'Ø190×20mm','0.94');
-    mk('Motor Lüfterrad','Kaufteil','PP GF15','4.80','Hella Kunststoffe','Freigegeben',100,0,'Ø140×18mm','0.14');
-    mk('Motor Lüfterhaube','Kaufteil','PP','3.20','Hella Kunststoffe','Freigegeben',100,0,'Ø160×22mm','0.09');
-    mk('Motor Lager antriebsseitig','Kaufteil','Stahl 100Cr6 – 6206-2Z','4.80','Schaeffler INA','Freigegeben',100,0,'Ø62×Ø30×16mm','0.14');
-    mk('Motor Lager lüfterseitig','Kaufteil','Stahl 100Cr6 – 6206-2Z','4.80','Schaeffler INA','Freigegeben',100,0,'Ø62×Ø30×16mm','0.14');
-    for(let ph=1;ph<=3;ph++){for(let e=1;e<=2;e++){mk(`Wicklung Phase${ph} Ende${e}`,'Kaufteil','Cu-Lackdraht 1.2mm','8.40','Oswald Elektromotoren','Freigegeben',100,0,'Wickelkopf','0.42');}}
-    mk('Kohlebürste 1','Kaufteil','Graphit EG8','2.40','Schunk Carbon','Freigegeben',100,0,'8×20×8mm','0.014');
-    mk('Kohlebürste 2','Kaufteil','Graphit EG8','2.40','Schunk Carbon','Freigegeben',100,0,'8×20×8mm','0.014');
-    mk('Bürstenhalter 1','Kaufteil','Messing MS63','1.80','Schunk Carbon','Freigegeben',100,0,'14×30×14mm','0.022');
-    mk('Bürstenhalter 2','Kaufteil','Messing MS63','1.80','Schunk Carbon','Freigegeben',100,0,'14×30×14mm','0.022');
-    mk('Motor Montageplatte','Eigenteil','Stahlblech DC01 2.0mm','14.60','Eigenfertigung Traunreut','Freigegeben',100,0,'220×12×240mm','1.02');
-    for(let i=1;i<=8;i++) mk(`Motor Schraube ${i}`,'Normteil','Stahl A2-70','0.12','Würth','Freigegeben',100,0,'M6×30mm','0.009');
-    for(let i=1;i<=20;i++) mk(`Antriebsriemen Seg ${String(i).padStart(2,'0')}`,'Kaufteil','EPDM Keilriemen','1.20','Gates','Freigegeben',100,0,'Segment','0.04');
-    mk('Riemenscheibe Motor','Eigenteil','Aluminium EN-AW 6082','12.40','Druckguss Heidenheim','Freigegeben',100,0,'Ø90×30mm','0.24');
-    mk('Riemenscheibe Trommel','Eigenteil','Aluminium EN-AW 6082','28.60','Druckguss Heidenheim','Freigegeben',100,0,'Ø250×25mm','1.10');
-    mk('Riemenspanner Halter','Eigenteil','Stahlblech DC01','6.40','Eigenfertigung Traunreut','Freigegeben',100,0,'40×15×80mm','0.18');
-    mk('Riemenspanner Arm','Eigenteil','Stahlblech DC01','3.20','Eigenfertigung Traunreut','Freigegeben',100,0,'12×12×60mm','0.07');
-    mk('Riemenspanner Rolle','Kaufteil','Stahl + POM','4.80','Schaeffler INA','Freigegeben',100,0,'Ø40×22mm','0.08');
-    mk('Riemenspanner Bolzen','Normteil','Stahl C45','1.20','Würth','Freigegeben',100,0,'M10×40mm','0.025');
-    mk('Riemenspanner Feder','Kaufteil','Federstahl','2.40','Gutekunst','Freigegeben',100,0,'Ø12×35mm','0.014');
-  }
-  /* ── Wasser ── */
-  else if(gid==='wasser'){
-    mk('Einlassventil Gehäuse','Kaufteil','PA66 GF15','8.40','Ceme','Freigegeben',100,0,'100×60×80mm','0.22');
-    mk('Einlassventil Spule 1','Kaufteil','Cu 0.4mm + Ferritkern','4.20','Oswald','Freigegeben',100,0,'Ø36×45mm','0.14');
-    mk('Einlassventil Spule 2','Kaufteil','Cu 0.4mm + Ferritkern','4.20','Oswald','Freigegeben',100,0,'Ø36×45mm','0.14');
-    mk('Einlassventil Filter 1','Kaufteil','PP Sieb 0.3mm','1.20','Ceme','Freigegeben',100,0,'Ø24×15mm','0.008');
-    mk('Einlassventil Filter 2','Kaufteil','PP Sieb 0.3mm','1.20','Ceme','Freigegeben',100,0,'Ø24×15mm','0.008');
-    mk('Einlassventil Stecker','Kaufteil','PA66','0.80','TE Connectivity','Freigegeben',100,0,'30×15×20mm','0.012');
-    [['Zulauf',12],['Ablauf',14],['Druckausgleich',10]].forEach(([label,r])=>{
-      for(let s=1;s<=3;s++) mk(`Schlauch ${label} Seg ${s}`,'Kaufteil',`EPDM Ø${r}mm`,'2.80','Continental ContiTech','Freigegeben',100,0,`Ø${r}×80mm L`,'0.04');
-      mk(`Schlauchschelle ${label} 1`,'Normteil','Stahl verz.','0.40','Norma','Freigegeben',100,0,`Ø${r+4}mm`,'0.008');
-      mk(`Schlauchschelle ${label} 2`,'Normteil','Stahl verz.','0.40','Norma','Freigegeben',100,0,`Ø${r+4}mm`,'0.008');
-    });
-    mk('Druckschalter Körper','Kaufteil','PA66 + Membran','6.80','Mop Aqua','Freigegeben',100,0,'40×40×35mm','0.06');
-    mk('Druckschalter Membran','Kaufteil','EPDM 0.4mm','1.20','Mop Aqua','Freigegeben',100,0,'Ø30×4mm','0.004');
-    mk('Druckschalter Stecker','Kaufteil','PA66','0.60','TE Connectivity','Freigegeben',100,0,'18×12×15mm','0.008');
-    mk('NTC Sensor Körper','Kaufteil','Edelstahl 1.4301','2.80','NXP Semiconductors','Freigegeben',100,0,'Ø10×22mm','0.012');
-    mk('NTC Sensor Dichtung','Kaufteil','EPDM','0.40','Freudenberg','Freigegeben',100,0,'Ø16×4mm','0.003');
-    mk('NTC Sensor Kabel','Kaufteil','Silikonkabel 2×0.5mm','0.80','Lapp','Freigegeben',100,0,'60mm L','0.004');
-    mk('Einspülschale Körper','Eigenteil','PP UV-stabil','6.40','Eigenfertigung Traunreut','Freigegeben',100,0,'160×60×90mm','0.18');
-    mk('Einspülschale Halter','Eigenteil','PP','2.80','Eigenfertigung Traunreut','Freigegeben',100,0,'165×10×95mm','0.08');
-    for(let i=1;i<=3;i++) mk(`Einspüldüse ${i}`,'Kaufteil','POM','1.20','Ceme','Freigegeben',100,0,'Ø12×15mm','0.006');
-    mk('Ablaufpumpe Gehäuse','Kaufteil','PP GF20','12.40','Fluid-o-Tech','Freigegeben',100,0,'Ø90×80mm','0.36');
-    mk('Ablaufpumpe Laufrad','Kaufteil','PP','4.80','Fluid-o-Tech','Freigegeben',100,0,'Ø76×20mm','0.08');
-    mk('Ablaufpumpe Motor','Kaufteil','Synchronmotor 30W','18.60','EBM-Papst','Freigegeben',100,0,'Ø60×55mm','0.42');
-    mk('Ablaufpumpe Einlauf','Kaufteil','PP','2.40','Fluid-o-Tech','Freigegeben',100,0,'Ø28×40mm','0.06');
-    mk('Ablaufpumpe Auslauf','Kaufteil','PP','2.40','Fluid-o-Tech','Freigegeben',100,0,'Ø28×40mm','0.06');
-    mk('Ablaufpumpe Füße','Kaufteil','NBR','1.20','Freudenberg','Freigegeben',100,0,'100×12×70mm','0.04');
-    mk('Ablauffilter Gehäuse','Eigenteil','PP','4.80','Eigenfertigung Traunreut','Freigegeben',100,0,'Ø60×60mm','0.12');
-    mk('Ablauffilter Sieb','Kaufteil','PP Sieb 1.0mm','2.40','Fluid-o-Tech','Freigegeben',100,0,'Ø52×50mm','0.06');
-  }
-  /* ── Heizung ── */
-  else if(gid==='heizung'){
-    mk('Heizelement Flansch','Eigenteil','Edelstahl 1.4301','8.40','Eigenfertigung Traunreut','Freigegeben',100,0,'120×15×60mm','0.42');
-    mk('Heizelement Dichtung','Kaufteil','Silikonflachdichtung','2.80','Freudenberg Sealing','Freigegeben',100,0,'122×4×62mm','0.018');
-    mk('Heizrohr 1 (1600W)','Kaufteil','Edelstahl Rohrheizk. 1.4301','22.40','Türk+Hillinger','Freigegeben',100,0,'Ø16×260mm','0.28');
-    mk('Heizrohr 2 (600W)','Kaufteil','Edelstahl Rohrheizk. 1.4301','12.80','Türk+Hillinger','Freigegeben',100,0,'Ø16×260mm','0.22');
-    mk('Verbindungsbogen','Kaufteil','Edelstahl 1.4301','4.20','Türk+Hillinger','Freigegeben',100,0,'R=15mm Ø16','0.06');
-    mk('Thermosicherung 1 (105°C)','Kaufteil','Thermal Cutout','2.40','Limitor','Freigegeben',100,0,'Ø8×14mm','0.006');
-    mk('Thermosicherung 2 (145°C)','Kaufteil','Thermal Cutout','2.40','Limitor','Freigegeben',100,0,'Ø8×14mm','0.006');
-    mk('Klemme 1 (6.3mm)','Normteil','Messing verz.','0.40','TE Connectivity','Freigegeben',100,0,'12×18×10mm','0.008');
-    mk('Klemme 2 (6.3mm)','Normteil','Messing verz.','0.40','TE Connectivity','Freigegeben',100,0,'12×18×10mm','0.008');
-    mk('Heizelement Abdeckung','Kaufteil','PP GF10','3.20','Rosti','Freigegeben',100,0,'125×8×65mm','0.06');
-    for(let i=1;i<=4;i++) mk(`Befestigungsmutter ${i}`,'Normteil','Messing M5','0.18','Würth','Freigegeben',100,0,'M5','0.004');
-    mk('NTC Temperatursensor','Kaufteil','NTC 10kΩ Edelstahl','2.80','NXP Semiconductors','Freigegeben',100,0,'Ø10×20mm','0.008');
-    mk('NTC Sensor Kabel','Kaufteil','Silikonkabel 2×0.5mm','0.60','Lapp','Freigegeben',100,0,'80mm L','0.005');
-  }
-  /* ── Aufhängung ── */
-  else if(gid==='aufhaengung'){
-    for(let i=1;i<=4;i++){
-      for(let c=1;c<=15;c++) mk(`Feder ${i} Windung ${String(c).padStart(2,'0')}`,'Kaufteil','Federstahl SH','2.80','Gutekunst Federn','Freigegeben',100,0,'Ø36mm Windung','0.06');
-      mk(`Feder ${i} Oberteller`,'Eigenteil','Stahlblech DC01','2.40','Eigenfertigung Traunreut','Freigegeben',100,0,'Ø64×8mm','0.08');
-      mk(`Feder ${i} Untertasse`,'Eigenteil','Stahlblech DC01','2.40','Eigenfertigung Traunreut','Freigegeben',100,0,'Ø64×8mm','0.08');
-      mk(`Feder ${i} Antivibrationspad`,'Kaufteil','NBR 40 Shore','1.80','Freudenberg','Freigegeben',100,0,'Ø70×6mm','0.022');
-      mk(`Feder ${i} Hängeöse`,'Eigenteil','Stahl S235','1.20','Eigenfertigung Traunreut','Freigegeben',100,0,'Ø20×20mm','0.024');
-    }
-    for(let i=1;i<=2;i++){
-      mk(`Dämpfer ${i} Zylinder`,'Kaufteil','Stahl verz.','8.40','Stabilus','Freigegeben',100,0,'Ø36×180mm','0.44');
-      mk(`Dämpfer ${i} Kolbenstange`,'Kaufteil','Stahl verchromt','4.80','Stabilus','Freigegeben',100,0,'Ø18×140mm','0.28');
-      mk(`Dämpfer ${i} Kolben`,'Kaufteil','Stahl + PTFE','2.40','Stabilus','Freigegeben',100,0,'Ø32×20mm','0.08');
-      mk(`Dämpfer ${i} Öldichtung`,'Kaufteil','NBR','1.20','Freudenberg','Freigegeben',100,0,'Ø22×8mm','0.006');
-      mk(`Dämpfer ${i} Öse Unten`,'Kaufteil','Zinkdruckguss','2.80','Stabilus','Freigegeben',100,0,'Ø20×20mm','0.042');
-      mk(`Dämpfer ${i} Öse Oben`,'Kaufteil','Zinkdruckguss','2.80','Stabilus','Freigegeben',100,0,'Ø20×20mm','0.042');
+  /* ── Rotorblätter (× 3) ── */
+  else if(gid==='blaetter'){
+    for(let b=1;b<=3;b++){
+      mk(`Blatt ${b} Schale suction side GFK/CFK`,'Eigenteil','E-Glass+CFK Hybrid Epoxy Resin','62000','SGL Carbon Wackersdorf','Freigegeben',100,0,'L=63m Schale','10800');
+      mk(`Blatt ${b} Schale pressure side GFK/CFK`,'Eigenteil','E-Glass+CFK Hybrid Epoxy Resin','62000','SGL Carbon Wackersdorf','Freigegeben',100,0,'L=63m Schale','10200');
+      mk(`Blatt ${b} Hauptholm CFK`,'Eigenteil','CFK UD-Gelege Epoxy T700','28000','SGL Carbon','Freigegeben',100,0,'L=60m B=600-200mm','4800');
+      mk(`Blatt ${b} Steg Vorderkante GFK`,'Eigenteil','GFK Biaxial Epoxy','4200','SGL Carbon','Freigegeben',100,0,'L=60m H=80-40mm','380');
+      mk(`Blatt ${b} Steg Hinterkante GFK`,'Eigenteil','GFK Biaxial Epoxy','4200','SGL Carbon','Freigegeben',100,0,'L=60m H=80-40mm','380');
+      mk(`Blatt ${b} Blattfußring Stahl`,'Eigenteil','Stahl 42CrMo4 V','8400','Anacon Rostock','Freigegeben',100,0,'Ø2100×H=160mm T=80mm','2400');
+      mk(`Blatt ${b} Klebeverbindung Schalen`,'Eigenteil','Epoxy-Strukturkleber Sikapower','2800','Sika Automotive','Freigegeben',100,0,'L=63m Klebelinie','180');
+      mk(`Blatt ${b} Blitzrezeptor Spitze`,'Kaufteil','Cu-Rezeptor Ø60mm IEC 61400-24','1200','Dehn + Söhne','Freigegeben',100,0,'Ø60mm H=280mm','0.48');
+      mk(`Blatt ${b} Blitzrezeptor Mitte`,'Kaufteil','Cu-Rezeptor seitlich','840','Dehn + Söhne','Freigegeben',100,0,'Ø38mm H=80mm','0.24');
+      mk(`Blatt ${b} Blitzableiter Cu-Band`,'Kaufteil','Cu-Band 25×4mm','1800','Dehn + Söhne','Freigegeben',100,0,'L=64m B=25mm','26');
+      mk(`Blatt ${b} Erosionsschutz Vorderkante`,'Kaufteil','PU-Tape 3M 8681HS','2400','3M GmbH','Freigegeben',100,0,'L=30m B=150mm','8.4');
+      mk(`Blatt ${b} Heizung Vorderkante (Anti-Icing)`,'Kaufteil','PTC-Heizfolie 12kW','8400','Backer GmbH','Bemusterung',82,0,'L=40m B=200mm','24');
+      mk(`Blatt ${b} CMS Dehnungsmessstreifen 1`,'Kaufteil','DMS Brücke 350Ω C1','480','HBM','Freigegeben',100,0,'Pos. 5m ab Fuß','0.008');
+      mk(`Blatt ${b} CMS Dehnungsmessstreifen 2`,'Kaufteil','DMS Brücke 350Ω C2','480','HBM','Freigegeben',100,0,'Pos. 20m ab Fuß','0.008');
+      mk(`Blatt ${b} CMS Beschleunigungssensor`,'Kaufteil','MEMs 3-Achsen ±4g Tri-axial','1200','PCB Piezotronics','Freigegeben',100,0,'50×50×20mm','0.12');
+      mk(`Blatt ${b} Kabel Sensoren (intern)`,'Kaufteil','PVC 12×0.5mm geschirmt','1800','Lapp Kabel','Freigegeben',100,0,'L=65m Bündel','18');
+      for(let r=1;r<=6;r++) mk(`Blatt ${b} Blattfuß-Stehbolzen M42 ${String(r).padStart(2,'0')}`,'Kaufteil','Stahl 10.9 feuerverzinkt','380','Peiner','Freigegeben',100,0,'M42×500mm','2.8');
     }
   }
-  /* ── Elektronik ── */
-  else if(gid==='elektronik'){
-    mk('Hauptplatine PCB','Kaufteil','FR4 4-lagig HAL-blei','42.60','Jabil Circuit','Freigegeben',100,0,'200×3×280mm','0.12');
-    const compTypes=[['IC','Infineon','8.40'],['Kondensator','Vishay','0.08'],['Widerstand','Yageo','0.02'],['Diode','Vishay','0.06'],['Stecker','TE Connectivity','0.40']];
-    for(let ci=0;ci<150;ci++){const[t,s,c]=compTypes[ci%5];mk(`Hauptplatine ${t} ${String(ci+1).padStart(3,'0')}`,t==='Stecker'?'Kaufteil':'SMD-Bauteil','diverse',c,s,'Freigegeben',100,0,'SMD','0.001');}
-    mk('Motorsteuerung PCB','Kaufteil','FR4 4-lagig','28.40','Jabil Circuit','Freigegeben',100,0,'140×3×180mm','0.08');
-    for(let ci=0;ci<80;ci++){const[t,s,c]=compTypes[ci%5];mk(`Motorst. ${t} ${String(ci+1).padStart(3,'0')}`,t==='Stecker'?'Kaufteil':'SMD-Bauteil','diverse',c,s,'Freigegeben',100,0,'SMD','0.001');}
-    mk('WLAN Modul v4','Kaufteil','FR4 + Keramikantenne','18.90','Infineon Regensburg','In Qualifizierung',88,true,'28×3×22mm','0.006');
-    mk('Bedienpanel PCB','Kaufteil','FR4 2-lagig','14.80','Jabil Circuit','Freigegeben',100,0,'500×3×80mm','0.06');
-    for(let ci=0;ci<60;ci++){const[t,s,c]=compTypes[ci%5];mk(`Bedien ${t} ${String(ci+1).padStart(2,'0')}`,t==='Stecker'?'Kaufteil':'SMD-Bauteil','diverse',c,s,'Freigegeben',100,0,'SMD','0.001');}
-    mk('Display TFT 3.5"','Kaufteil','TFT IPS 320×240','14.40','Raystar Optronics','Freigegeben',100,0,'80×4×56mm','0.042');
-    mk('Display Gehäuse','Kaufteil','ABS','2.40','Rosti','Freigegeben',100,0,'84×12×60mm','0.024');
-    mk('Display Glas Schutz','Kaufteil','Gorilla Glass 0.7mm','4.80','Corning','Freigegeben',100,0,'76×0.7×50mm','0.012');
-    mk('Display Stecker','Kaufteil','FFC 12-pol.','0.40','Molex','Freigegeben',100,0,'12mm Raster 0.5mm','0.002');
-    mk('Display Kabel FFC','Kaufteil','FFC 12-pol. L=60mm','0.80','Molex','Freigegeben',100,0,'60mm','0.003');
-    for(let ki=1;ki<=3;ki++){mk(`Drehregler ${ki} Kappe`,'Kaufteil','ABS','1.20','Rosti','Freigegeben',100,0,'Ø30×8mm','0.008');mk(`Drehregler ${ki} Körper`,'Kaufteil','Encoder+Poti','2.40','Alps Electric','Freigegeben',100,0,'Ø24×14mm','0.012');mk(`Drehregler ${ki} Welle`,'Normteil','Stahl','0.20','Alps Electric','Freigegeben',100,0,'Ø6×10mm','0.002');mk(`Drehregler ${ki} Platine`,'Kaufteil','FR4','1.20','Alps Electric','Freigegeben',100,0,'20×3×20mm','0.004');}
-    for(let bi=1;bi<=8;bi++){mk(`Taste ${bi} Kappe`,'Kaufteil','ABS','0.60','Rosti','Freigegeben',100,0,'18×6×12mm','0.004');mk(`Taste ${bi} Körper`,'Kaufteil','Taktschalter','0.40','Alps Electric','Freigegeben',100,0,'12×10×10mm','0.002');mk(`Taste ${bi} Feder`,'Kaufteil','Federstahl','0.10','Gutekunst','Freigegeben',100,0,'Ø6×6mm','0.001');}
-    for(let ci=1;ci<=20;ci++) mk(`Steckverbinder ${String(ci).padStart(2,'0')}`,'Kaufteil','PA66 + Kontakte Cu','0.40','TE Connectivity','Freigegeben',100,0,'15×12×8mm','0.006');
+  /* ── Generator & Antrieb ── */
+  else if(gid==='generator'){
+    mk('PMSG Stator-Joch (Schweißkonstruktion)','Eigenteil','Stahl S355 + Elektroblech','82000','Enercon Aurich','Freigegeben',100,true,'Ø4800×L=1240mm','18400');
+    mk('Stator Wickelkopf Phase U','Eigenteil','Cu-Rechteckdraht 8×4mm Epoxy','28000','Enercon Aurich','Freigegeben',100,true,'126 Nuten','2800');
+    mk('Stator Wickelkopf Phase V','Eigenteil','Cu-Rechteckdraht 8×4mm Epoxy','28000','Enercon Aurich','Freigegeben',100,true,'126 Nuten','2800');
+    mk('Stator Wickelkopf Phase W','Eigenteil','Cu-Rechteckdraht 8×4mm Epoxy','28000','Enercon Aurich','Freigegeben',100,true,'126 Nuten','2800');
+    mk('Stator Isoliersystem (Harz-Tränkung)','Kaufteil','Epoxy VPI Imprägnierung H-Klasse','4200','Elantas','Freigegeben',100,0,'Gesamtwicklung','380');
+    mk('Rotor Polrad (Schweißkonstruktion)','Eigenteil','Stahl S355','48000','Enercon Aurich','Freigegeben',100,true,'Ø5200×L=1180mm','22000');
+    mk('Permanent-Magnete NdFeB (×504)','Kaufteil','NdFeB N48H Sintertechnik','42000','VAC Hanau','Freigegeben',100,true,'180×80×30mm je Magnet','1820');
+    mk('Rotor Magnethalteblech','Eigenteil','Stahl S235 verzinkt','8400','Anacon Rostock','Freigegeben',100,0,'504× Halteplatte','420');
+    mk('Generator Lager haupts. SKF','Kaufteil','SKF 23180 CC/C3W33 Pendelrollenlager','12000','SKF Gothenburg','Freigegeben',100,0,'Ø1420/Ø1180×B=243mm','840');
+    mk('Generator Lager gen.seitig SKF','Kaufteil','SKF 23164 CC/C3W33','8400','SKF Gothenburg','Freigegeben',100,0,'Ø1180/Ø1000×B=180mm','620');
+    mk('Generator Gehäuse GFK-Schale','Eigenteil','GFK Epoxy Sandwich','18000','Anacon Bremerhaven','Freigegeben',100,0,'Ø5800×L=1600mm','1840');
+    mk('Kühlsystem Wasser-Wärmetauscher','Kaufteil','Edelstahl 1.4571 Plattenwärmetauscher','8400','Alfa Laval','Freigegeben',100,0,'800×400×H=200mm','84');
+    mk('Kühlpumpe Kreislauf','Kaufteil','Wilo NL 65/160-11 IE3','2800','Wilo SE','Freigegeben',100,0,'11kW','62');
+    mk('Kühlschlauch DN65 (Eingang)','Kaufteil','EPDM verstärkt DN65','480','Continental','Freigegeben',100,0,'L=3200mm','8.4');
+    mk('Kühlschlauch DN65 (Ausgang)','Kaufteil','EPDM verstärkt DN65','480','Continental','Freigegeben',100,0,'L=3200mm','8.4');
+    mk('Temperaturschutz PT100 × 6','Kaufteil','Pt100 Edelstahl 1/3B','1800','ABB','Freigegeben',100,0,'Ø8×L=100mm','0.12');
+    mk('Schwingungsschutz CMS Acc. × 4','Kaufteil','MEMs 3D 25,6kS/s Schottkyvibration','2800','PCB Piezotronics','Freigegeben',100,0,'Ø25×H=40mm','0.48');
+    mk('Koppelflansch Generator-Nabe','Eigenteil','Stahl 42CrMo4 V Schmiedestück','22000','Saarschmiede','Freigegeben',100,0,'Ø920×H=280mm','2400');
+    for(let i=1;i<=12;i++) mk(`Generator Erdungsband ${String(i).padStart(2,'0')}`,'Kaufteil','Cu-Band 50×5mm','180','Dehn','Freigegeben',100,0,'L=600mm','1.2');
+    for(let i=1;i<=8;i++) mk(`Generator Kühlrippe ${String(i).padStart(2,'0')}`,'Eigenteil','Aluminium EN-AW 6082','2400','Anacon Rostock','Freigegeben',100,0,'1200×80×5mm','2.4');
   }
-  /* ── Schublade ── */
-  else if(gid==='schublade'){
-    mk('Schublade Gehäuse','Eigenteil','PP UV-stabil','6.40','Eigenfertigung Traunreut','Freigegeben',100,0,'195×80×100mm','0.22');
-    mk('Schublade Körper','Eigenteil','PP','4.80','Eigenfertigung Traunreut','Freigegeben',100,0,'185×70×90mm','0.16');
-    mk('Schublade Griff','Kaufteil','ABS Chrom-optik','3.20','Rosti','Freigegeben',100,0,'185×8×18mm','0.048');
-    mk('Kammer Vorwäsche','Eigenteil','PP','1.20','Eigenfertigung Traunreut','Freigegeben',100,0,'55×65×85mm','0.04');
-    mk('Kammer Hauptwäsche','Eigenteil','PP','1.20','Eigenfertigung Traunreut','Freigegeben',100,0,'55×65×85mm','0.04');
-    mk('Kammer Weichspüler','Eigenteil','PP','1.20','Eigenfertigung Traunreut','Freigegeben',100,0,'55×65×85mm','0.04');
-    mk('Trennwand 1','Eigenteil','PP','0.40','Eigenfertigung Traunreut','Freigegeben',100,0,'3×65×85mm','0.008');
-    mk('Trennwand 2','Eigenteil','PP','0.40','Eigenfertigung Traunreut','Freigegeben',100,0,'3×65×85mm','0.008');
-    mk('Siphon Körper','Kaufteil','PP','2.40','Ceme','Freigegeben',100,0,'Ø24×60mm','0.028');
-    mk('Siphon Heberrohr','Kaufteil','PP','1.20','Ceme','Freigegeben',100,0,'Ø12×55mm','0.012');
-    mk('Siphon Dichtung','Kaufteil','EPDM','0.60','Freudenberg','Freigegeben',100,0,'Ø26×4mm','0.004');
-    mk('Siphon Kappe','Kaufteil','PP','0.80','Ceme','Freigegeben',100,0,'Ø28×8mm','0.008');
-    mk('Siphon Feder','Kaufteil','Federstahl','0.40','Gutekunst','Freigegeben',100,0,'Ø10×40mm','0.006');
-    mk('Führungsschiene Links','Eigenteil','PP GF10','2.40','Eigenfertigung Traunreut','Freigegeben',100,0,'6×80×95mm','0.024');
-    mk('Führungsschiene Rechts','Eigenteil','PP GF10','2.40','Eigenfertigung Traunreut','Freigegeben',100,0,'6×80×95mm','0.024');
-    mk('Wasserverteiler','Eigenteil','PP','3.20','Eigenfertigung Traunreut','Freigegeben',100,0,'180×10×15mm','0.028');
-    for(let i=1;i<=3;i++) mk(`Einspüldüse ${i}`,'Kaufteil','POM','0.60','Ceme','Freigegeben',100,0,'Ø8×15mm','0.004');
-    for(let i=1;i<=8;i++) mk(`Schraube M3×12 ${i}`,'Normteil','Stahl A2','0.04','Würth','Freigegeben',100,0,'M3×12mm','0.002');
-    for(let i=1;i<=5;i++) mk(`Schnappclip ${i}`,'Kaufteil','PA66','0.10','Richco','Freigegeben',100,0,'8×5×8mm','0.002');
+  /* ── Pitch-System ── */
+  else if(gid==='pitch'){
+    for(let b=1;b<=3;b++){
+      mk(`Pitch-Antrieb ${b} Elektromotor (AC Servo)`,'Kaufteil','Liebherr LSP-42 AC-Servomotor 55kW','12000','Liebherr Components','Freigegeben',100,0,'L=620mm Ø250mm','84');
+      mk(`Pitch-Antrieb ${b} Getriebe (Planetenstufe)`,'Kaufteil','Liebherr PGS-42 i=1:98','8400','Liebherr Components','Freigegeben',100,0,'L=480mm Ø300mm','180');
+      mk(`Pitch-Antrieb ${b} Ritzel m=14 z=14`,'Eigenteil','Stahl 20MnCr5 nitriert','4200','Anacon Rostock','Freigegeben',100,0,'m14 z14 B=120mm','28');
+      mk(`Pitch-Antrieb ${b} Frequenzumrichter`,'Kaufteil','SEW Eurodrive Movidrive B 55kW','6800','SEW Eurodrive','Freigegeben',100,0,'560×420×H=250mm','18');
+      mk(`Pitch-Antrieb ${b} Notlaufakku 24V 60Ah`,'Kaufteil','SAFT Li-Ion 24V 60Ah Offshore','4800','Saft Batteries','Freigegeben',100,0,'420×180×H=240mm','24');
+      mk(`Pitch-Antrieb ${b} Batterie-Ladekreis`,'Kaufteil','Exide Technologies Ladegerät','1200','Exide','Freigegeben',100,0,'280×160×H=80mm','4.8');
+      mk(`Pitch-Antrieb ${b} Drehgeber Blattwinkel`,'Kaufteil','Heidenhain EQN 437 Absolutencoder','2400','Heidenhain','Freigegeben',100,0,'Ø58×L=65mm','0.28');
+      mk(`Pitch-Antrieb ${b} Steuerplatine PTC`,'Kaufteil','PTC Thyssen Krupp Pitch Control','3800','Thalweg Elektronik','Freigegeben',100,0,'240×160×H=12mm','0.48');
+      mk(`Pitch-Antrieb ${b} Endlagenschalter`,'Kaufteil','Schmersal BNS 320 Sicherheitsschalter','840','Schmersal','Freigegeben',100,0,'80×40×H=30mm','0.18');
+      mk(`Pitch-Antrieb ${b} Kabelführung Nabe`,'Kaufteil','Igus e-chain R75 Energiekette','1800','Igus','Freigegeben',100,0,'L=4m B=75mm','8.4');
+      mk(`Pitch-Antrieb ${b} Schmiersystem Fett`,'Kaufteil','Beka-Max EP-1 Progressiv-Fettschmierung','1200','Beka Lube','Freigegeben',100,0,'Behälter 8kg','8');
+      for(let s=1;s<=4;s++) mk(`Pitch ${b} Sensor PT100 ${s}`,'Kaufteil','Pt100 Edelstahl','280','ABB','Freigegeben',100,0,'Ø6×L=60mm','0.04');
+    }
+    for(let i=1;i<=4;i++) mk(`Pitch-Steuerung Hauptschrank ${i}`,'Kaufteil','Stahl-Schaltschrank IP65 24V DC','4800','Rittal','Freigegeben',100,0,'800×600×H=250mm','28');
   }
-  /* ── Kabelbaum ── */
-  else if(gid==='kabelbaum'){
-    for(let i=1;i<=20;i++) mk(`Kabel Hauptstamm Seg ${String(i).padStart(2,'0')}`,'Kaufteil','PVC 8×0.75mm','2.80','Lapp Kabel','Freigegeben',100,0,'50mm L','0.02');
-    [['Motor',8],['Pumpe',8],['Heizung',8],['Einlassventil',8],['Türschloss',6],['Sensoren',10]].forEach(([b,c])=>{for(let i=1;i<=c;i++) mk(`Kabel ${b} Seg ${String(i).padStart(2,'0')}`,'Kaufteil','PVC 2×0.75mm','0.80','Lapp Kabel','Freigegeben',100,0,'40mm L','0.004');});
-    for(let i=1;i<=100;i++) mk(`Kabelbinder ${String(i).padStart(3,'0')}`,'Normteil','PA66 natur','0.06','Hellermann Tyton','Freigegeben',100,0,'200×3.5mm','0.002');
-    for(let i=1;i<=80;i++) mk(`Kabelclip ${String(i).padStart(2,'0')}`,'Kaufteil','PA66','0.08','Richco','Freigegeben',100,0,'12×6×8mm','0.003');
-    for(let i=1;i<=30;i++) mk(`Steckergehäuse ${String(i).padStart(2,'0')}`,'Kaufteil','PA66 + Cu-Kontakte','0.40','TE Connectivity','Freigegeben',100,0,'18×12×12mm','0.008');
-    for(let i=1;i<=150;i++) mk(`Steckerpin ${String(i).padStart(3,'0')}`,'Kaufteil','Cu Sn6 vergoldet','0.06','TE Connectivity','Freigegeben',100,0,'Ø1.0×8mm','0.0005');
-    for(let i=1;i<=50;i++) mk(`Schrumpfschlauch ${String(i).padStart(2,'0')}`,'Kaufteil','PE 2:1','0.04','Hellermann Tyton','Freigegeben',100,0,'Ø8×20mm','0.001');
-    for(let i=1;i<=10;i++) mk(`Massepunkt ${i}`,'Kaufteil','Messing M4','0.40','Würth','Freigegeben',100,0,'Ø12×4mm','0.006');
+  /* ── Yaw-System ── */
+  else if(gid==='yaw'){
+    mk('Yaw-Lager Wälzlager (Großwälzlager)','Kaufteil','Rothe Erde 131.40.4500.03 Vierp.','28000','Rothe Erde','Freigegeben',100,0,'Ø4800/Ø4500×H=170mm','4200');
+    mk('Yaw-Lager Zahntrieb Innenring (z=180)','Eigenteil','Stahl 42CrMo4 V gehärtet','8400','Anacon Rostock','Freigegeben',100,0,'Modul m=18 z=180','1800');
+    for(let i=1;i<=6;i++){
+      mk(`Yaw-Antrieb ${i} Elektromotor 4kW`,'Kaufteil','SEW DRE132S4 IE3 Drehstrommotor','2800','SEW Eurodrive','Freigegeben',100,0,'B3 B=210mm','38');
+      mk(`Yaw-Antrieb ${i} Planetengetriebe i=1:150`,'Kaufteil','SEW P312 Planetengetriebe','4200','SEW Eurodrive','Freigegeben',100,0,'MA=12kNm','84');
+      mk(`Yaw-Antrieb ${i} Ritzel m=18 z=12`,'Eigenteil','Stahl 20MnCr5 nitriert','2400','Anacon Rostock','Freigegeben',100,0,'m18 z12 B=180mm','18');
+      mk(`Yaw-Antrieb ${i} Bremse (Federkraft)','Kaufteil','Stromag NFB 320 Scheibenbremse 25kNm','3200','Stromag','Freigegeben',100,0,'Ø320mm Reibscheibe','28');
+    }
+    mk('Yaw-Dämpfer Hydraulisch (×4)','Kaufteil','Stabilus ACMER 4T Hydraulikdämpfer','8400','Stabilus','Freigegeben',100,0,'Ø160mm Hub=400mm','84');
+    mk('Yaw-Winkelgeber absolut','Kaufteil','Pepperl+Fuchs WCS3-LS410 Encoder','2400','Pepperl+Fuchs','Freigegeben',100,0,'Ø58mm L=95mm','0.42');
+    mk('Windfahne (Referenz Wind-Direction)','Kaufteil','Thies Clima Wind-Direction Sensor','1800','Thies Clima','Freigegeben',100,0,'Ø150mm H=600mm','2.8');
+    mk('Schmiersystem Yaw-Lager Fett','Kaufteil','Beka-Max EP-1 16 Schmierpunkte','2800','Beka Lube','Freigegeben',100,0,'Behälter 24kg','24');
+    mk('Yaw-Steuerung SPS-Modul','Kaufteil','Beckhoff CX2040 IPC Yaw Control','4200','Beckhoff','Freigegeben',100,0,'86mm DIN-Schiene','1.2');
+    mk('Blitzkollektorringe (Gondel-Turm)','Kaufteil','Schleifringkörper Cu/Ag 2400A','8400','Schunk','Freigegeben',100,0,'Ø380×H=420mm','24');
+    for(let i=1;i<=4;i++) mk(`Yaw-Bremssattel ${i} (Festsattel)`,'Kaufteil','Hydraulik-Festsattel 40 bar','2800','Haldex','Freigegeben',100,0,'320×240×H=160mm','28');
   }
-  /* ── Befestigung ── */
+  /* ── Gondelgehäuse ── */
+  else if(gid==='gondel'){
+    mk('Gondel Hauptrahmen (Stahlschweißkonstruktion)','Eigenteil','Stahl S355J2+N Schweißbaugruppe','68000','Anacon Rostock','Freigegeben',100,0,'L=9000×B=4200×H=3200mm','28000');
+    mk('Gondel GFK-Außenschale vorne','Eigenteil','GFK Epoxy Resin Infusion','12000','Anacon Bremerhaven','Freigegeben',100,0,'L=4500mm Segment','1200');
+    mk('Gondel GFK-Außenschale hinten','Eigenteil','GFK Epoxy Resin Infusion','9000','Anacon Bremerhaven','Freigegeben',100,0,'L=3800mm Segment','980');
+    mk('Gondel GFK-Seite links','Eigenteil','GFK Epoxy Resin Infusion','6000','Anacon Bremerhaven','Freigegeben',100,0,'L=9000×H=3200mm','820');
+    mk('Gondel GFK-Seite rechts','Eigenteil','GFK Epoxy Resin Infusion','6000','Anacon Bremerhaven','Freigegeben',100,0,'L=9000×H=3200mm','820');
+    mk('Gondel GFK-Dach','Eigenteil','GFK Epoxy UV-Schutz','8400','Anacon Bremerhaven','Freigegeben',100,0,'L=8800×B=4000mm','1040');
+    mk('Gondel GFK-Boden (begehbar)','Eigenteil','GFK Sandwich Schaumkern','4800','Anacon Bremerhaven','Freigegeben',100,0,'L=8800×B=3800mm','840');
+    mk('Servicekran Gondel (Elektrohängebahn)','Kaufteil','Demag KBK 3200kg Hängebahn','24000','Demag Cranes','Freigegeben',100,0,'Schiene L=7m Ausl.4m','820');
+    mk('Servicekran Kettenzug 3,2t','Kaufteil','Demag DCM Pro 3200-8-H8-C','8400','Demag Cranes','Freigegeben',100,0,'Hub=8m','84');
+    mk('Gitterrost-Bodensystem Gondel','Kaufteil','Stahl galv. Gitterrost 30×3','4200','Gitterrosttechnik','Freigegeben',100,0,'9000×3600mm Passz.','480');
+    mk('Personensicherheitssystem (PSA-Punkte)','Kaufteil','Tractel Absturzsicherung SRL-P','4800','Tractel','Freigegeben',100,0,'EN 360 Stahlseil','4.8');
+    mk('Belüftungsanlage (Ex-Schutz)','Kaufteil','Systemair Ex-Ventilator DVEX 560','2800','Systemair','Freigegeben',100,0,'Ø560mm 5500m3/h','42');
+    mk('Beleuchtung Gondel LED Ex-Schutz','Kaufteil','Glamox EX-D LED 40W IP67','1200','Glamox','Freigegeben',100,0,'L=600mm','2.4');
+    mk('Feuerlöschanlage CO2 Gondel','Kaufteil','Minimax MX 1230 CO2 Löschanlage','18000','Minimax Viking','Freigegeben',100,0,'6×CO2-Flasche 30kg','280');
+    mk('Temperaturüberwachung Gondel','Kaufteil','PT100 × 8 Lufttemperatur','840','ABB','Freigegeben',100,0,'Ø8×L=100mm','0.08');
+    mk('Gondel-Hubluftschleuse (Offshore)','Kaufteil','CHA Offshore Gondel Transfer-System','8400','Ampelmann','Freigegeben',100,0,'Ø1800mm Schleuse','240');
+    mk('Dachöffnung Lastkran-Luke','Eigenteil','Stahl S355 + GFK-Deckel','2400','Anacon Rostock','Freigegeben',100,0,'1800×1800mm','180');
+    for(let i=1;i<=8;i++) mk(`Gondel Wartungsöffnung ${String(i).padStart(2,'0')}`,'Eigenteil','Stahl S235 + Dichtung','840','Anacon Rostock','Freigegeben',100,0,'600×600mm','18');
+    for(let i=1;i<=6;i++) mk(`Kabelkanal Gondel Segment ${String(i).padStart(2,'0')}`,'Kaufteil','Stahl galv. Kabelpritschen','380','Niedax','Freigegeben',100,0,'3000×200×H=60mm','8.4');
+  }
+  /* ── Umrichter & Elektrik ── */
+  else if(gid==='umrichter'){
+    mk('Umrichter ABB PCS6000 3MVA Leistungsteil A','Kaufteil','ABB PCS6000-E0-3025-04 IGBT','62000','ABB Turgi CH','Freigegeben',100,0,'2200×800×H=2000mm','820');
+    mk('Umrichter ABB PCS6000 3MVA Leistungsteil B','Kaufteil','ABB PCS6000-E0-3025-04 IGBT','62000','ABB Turgi CH','Freigegeben',100,0,'2200×800×H=2000mm','820');
+    mk('Umrichter Steuerung ACS880-67LC','Kaufteil','ABB ACS880 Steuereinheit 3MVA','28000','ABB Turgi CH','Freigegeben',100,0,'600×400×H=300mm','42');
+    mk('Transformator 0.69/33kV 3,3MVA','Kaufteil','ABB RESIBLOC Giessharz 3,3MVA','48000','ABB Transformers','Freigegeben',100,0,'L=2400×B=1200×H=2100','4200');
+    mk('Hauptschaltanlage 33kV','Kaufteil','ABB ZX2 gasisoliert 630A 21kV','28000','ABB','Freigegeben',100,0,'L=1600×B=800×H=1800','380');
+    mk('USV-Anlage 10kVA 30min','Kaufteil','APC Smart-UPS 10kVA','4800','APC by Schneider','Freigegeben',100,0,'L=680×B=440×H=850','120');
+    mk('Niederspannungshauptverteilung','Eigenteil','Rittal TS8 Stahl Schaltschrank','8400','Rittal','Freigegeben',100,0,'1600×600×H=2000','180');
+    mk('Niederspannung-Schütz Antrieb 500A','Kaufteil','Siemens 3RT2065 Schütz 500A','2800','Siemens AG','Freigegeben',100,0,'L=120×B=80×H=160mm','2.4');
+    mk('Erdungsschalter 33kV (×3)','Kaufteil','ABB OHB Erdungs-Kurzschließer','4200','ABB','Freigegeben',100,0,'33kV 20kA 3s','8.4');
+    mk('Stromschienenanlage Cu 3200A','Eigenteil','Cu-Sammelschiene Ø60mm 3200A','12000','Luvata','Freigegeben',100,0,'L=8m 3-ph+N','84');
+    mk('Kabeleinführung EMV (×24 Kabel)','Kaufteil','Roxtec CM Multi-cable Transit','2400','Roxtec','Freigegeben',100,0,'24× Durchführung','24');
+    mk('Sinusfilter 33kV LC-Filter','Kaufteil','Schaffner FN 5010 3MVA','8400','Schaffner','Freigegeben',100,0,'L=1200×B=600×H=1000','120');
+    mk('Netzgüte-Messgerät (Oberwellen)','Kaufteil','Dranetz HDPQ THD Analyzer','4800','Dranetz','Freigegeben',100,0,'L=280×B=190×H=60mm','2.4');
+    mk('Energiezähler MID Klasse 0,2S','Kaufteil','Siemens SENTRON PAC4200 Zähler','1800','Siemens AG','Freigegeben',100,0,'DIN-Schiene','0.42');
+    for(let i=1;i<=10;i++) mk(`Leistungsrelais SEL ${String(i).padStart(2,'0')}`,'Kaufteil','SEL-451 Netzschutzrelais','2800','Schweitzer SEL','Freigegeben',100,0,'19" 2HE','2.4');
+    for(let i=1;i<=20;i++) mk(`NH-Sicherung 800A gG ${String(i).padStart(2,'0')}`,'Kaufteil','Sicherungseinsatz NH3 800A gG','48','Jean Müller','Freigegeben',100,0,'NH3 800A','0.24');
+    const compE=[['IGBT-Modul 1200A','Infineon','4800'],['Gleichrichterdiode 2000A','Infineon','840'],['Kondensator DC-Link 2200µF','Vishay','280'],['Gate-Treiber ICH11T','Semikron','180'],['Stromwandler Busbar','LEM','620']];
+    for(let ci=0;ci<80;ci++){const[t,s,c]=compE[ci%5];mk(`Umrichter ${t} ${String(ci+1).padStart(3,'0')}`,'SMD-Bauteil','Leistungselektronik',c,s,'Freigegeben',100,0,'Datenblatmaß','diverse');}
+  }
+  /* ── SCADA & Steuerung ── */
+  else if(gid==='scada'){
+    mk('WPS-Hauptrechner (Windenergy Power Server)','Kaufteil','Beckhoff C6030 Industrie-IPC','8400','Beckhoff Automation','Freigegeben',100,0,'L=232×B=96×H=56mm','1.2');
+    mk('Sicherheits-SPS Pilz PNOZmulti2','Kaufteil','Pilz PNOZmulti2 M B0 SIL2','4800','Pilz GmbH','Freigegeben',100,0,'L=88×B=120×H=126mm','0.84');
+    mk('Leitebene-IPC Redundanz','Kaufteil','Beckhoff C6920 Server IPC','6800','Beckhoff Automation','Freigegeben',100,0,'L=400×B=180×H=280mm','8.4');
+    mk('SCADA-Kommunikationsserver','Kaufteil','Cisco Industrie-Router IE-3300-8T2S','3800','Cisco Systems','Freigegeben',100,0,'L=440×B=44×H=350mm','4.8');
+    mk('EtherCAT-Feldbus-Koppler (×12)','Kaufteil','Beckhoff EK1100 EtherCAT Koppler','2400','Beckhoff','Freigegeben',100,0,'12mm DIN','0.08');
+    mk('Anemometer Windgeschwindigkeit','Kaufteil','Thies Clima 2D Ultraschall 4.3821.00','3200','Thies Clima','Freigegeben',100,0,'L=400mm Ø220mm','1.8');
+    mk('Windfahne Nacelle (redundant)','Kaufteil','Thies Clima Windrichtung 4.3150.00.000','1800','Thies Clima','Freigegeben',100,0,'Ø150mm H=600mm','2.8');
+    mk('Eisdetektionssystem Sensor','Kaufteil','Labkotec IDS Ice Detection System','4800','Labkotec','Freigegeben',100,0,'Gondel-Montage Schacht','4.2');
+    mk('Blitzschutzmessung OBO V280','Kaufteil','OBO Bettermann DEHNventil M TN-S','2400','OBO Bettermann','Freigegeben',100,0,'Ø112 H=160mm','1.2');
+    mk('GPS/GNSS Zeitreferenz NTP','Kaufteil','Moser-Baer GPS-168 NTP-Server','1800','Moser-Baer','Freigegeben',100,0,'L=170×B=50×H=120mm','0.62');
+    mk('Remote I/O EtherCAT EL1809 (×8)','Kaufteil','Beckhoff EL1809 16x Dig. Eingang','840','Beckhoff','Freigegeben',100,0,'12mm DIN','0.06');
+    mk('Remote I/O EtherCAT EL2809 (×8)','Kaufteil','Beckhoff EL2809 16x Dig. Ausgang','840','Beckhoff','Freigegeben',100,0,'12mm DIN','0.06');
+    mk('Analogeingang EtherCAT EL3164 (×6)','Kaufteil','Beckhoff EL3164 4×0-10V Eingang','620','Beckhoff','Freigegeben',100,0,'12mm DIN','0.04');
+    mk('CMS Vibrations-Auswerteeinheit','Kaufteil','SKF Microlog IMx-8 Online CMS','12000','SKF','Freigegeben',100,0,'L=220×B=88×H=58mm','1.2');
+    mk('Datenaufzeichnung Historian','Kaufteil','OSIsoft PI Historian Server (Lizenz + HW)','18000','AVEVA OSIsoft','Freigegeben',100,0,'2HE Rack-Server','8.4');
+    mk('4G/LTE-Router Offshore','Kaufteil','Sierra Wireless RV55 Industrie-Router','2400','Sierra Wireless','Freigegeben',100,0,'L=182×B=102×H=38mm','0.84');
+    mk('Ethernet-Switch managed 24-port','Kaufteil','Hirschmann MACH1040 ind. Managed Switch','4800','Hirschmann Belden','Freigegeben',100,0,'19" 1HE','2.8');
+    mk('Firewall Industrie Ruggedcom','Kaufteil','Siemens Ruggedcom RX1510 IEC 62443','6800','Siemens AG','Freigegeben',100,0,'L=440×B=44×H=180mm','2.4');
+    for(let i=1;i<=8;i++) mk(`SPS Eingangsmodul DI ${String(i).padStart(2,'0')}`,'Kaufteil','Beckhoff EL1809 16-ch','840','Beckhoff','Freigegeben',100,0,'12mm DIN','0.06');
+    for(let i=1;i<=8;i++) mk(`SPS Ausgangsmodul DO ${String(i).padStart(2,'0')}`,'Kaufteil','Beckhoff EL2809 16-ch','840','Beckhoff','Freigegeben',100,0,'12mm DIN','0.06');
+    for(let i=1;i<=6;i++) mk(`Temperaturfühler SCADA PT100 ${String(i).padStart(2,'0')}`,'Kaufteil','Pt100 4-Draht 1/3 Class B','280','ABB','Freigegeben',100,0,'Ø6×L=100mm','0.04');
+    for(let ci=1;ci<=20;ci++) mk(`Verkabelung SCADA-Strang ${String(ci).padStart(2,'0')}`,'Kaufteil','Lapp ÖLFLEX 7G1.5mm Steuerleitung','480','Lapp Kabel','Freigegeben',100,0,'L=50m Bündel','4.8');
+  }
+  /* ── Kabelanlage Offshore ── */
+  else if(gid==='kabel'){
+    mk('Export-Kabel 33kV CU 3×240mm²','Kaufteil','Nexans 33kV CU 3×240 Submarine','180000','Nexans','Freigegeben',100,0,'L=5km Seekabel','84000');
+    mk('Kabelmuffe Gondel-Turm 33kV','Kaufteil','Prysmian Muffe 33kV Übergangsstück','4800','Prysmian','Freigegeben',100,0,'33kV CU 3×240mm²','24');
+    mk('J-Tube Seal 33kV Kabel','Kaufteil','CRP Aries Polymer J-Tube Seal','2800','CRP Subsea','Freigegeben',100,0,'Ø630mm Polyurethan','42');
+    mk('Kabelzug-Entlastungsklemme DN630','Kaufteil','Roxtec CF Strain Relief Clamp','1800','Roxtec','Freigegeben',100,0,'DN630 Stahlbügel','28');
+    mk('Turmkabel 33kV CU 1×300mm² (×3)','Kaufteil','Prysmian FG16OR16 33kV 1×300mm²','24000','Prysmian','Freigegeben',100,0,'L=100m je Phase','2400');
+    mk('Hilfskabel XLPE 1kV 25×4mm²','Kaufteil','Lapp ÖLFLEX ROBUST 25×4mm² 1kV','4800','Lapp Kabel','Freigegeben',100,0,'L=120m Turm','24');
+    mk('Sicherheitskabel LSZH 16×2×0.75mm²','Kaufteil','Belden LSZH Signal 16×2×0.75mm²','2400','Belden','Freigegeben',100,0,'L=200m','8.4');
+    mk('Glasfaser-LWL Single-Mode 24F','Kaufteil','Corning SMF-28e+ 24F Offshore','8400','Corning','Freigegeben',100,0,'L=5km Ø14mm','42');
+    mk('LWL Spleißbox Gondel','Kaufteil','Telegärtner H02050A0134 Splice Box','1200','Telegärtner','Freigegeben',100,0,'24 Spleiße','1.8');
+    mk('LWL Spleißbox Monopile','Kaufteil','Telegärtner H02050A0134 Splice Box','1200','Telegärtner','Freigegeben',100,0,'24 Spleiße','1.8');
+    mk('Kabeltasse Turm (Kabelführung)','Kaufteil','Niedax Kabelpritschen Stahl galv.','3800','Niedax','Freigegeben',100,0,'L=100m Strang','38');
+    mk('Kabelbündel Verbinder Turm (×40)','Kaufteil','Igus Kabelschlauch CF9 DN50','2800','Igus','Freigegeben',100,0,'L=1m je Bügel','0.12');
+    mk('Erdungsleiter CU 95mm² Turm','Kaufteil','Lapp Erdungsband Cu 95mm²','2400','Lapp','Freigegeben',100,0,'L=100m','28');
+    mk('Potenzialausgleichsschiene Turm','Kaufteil','Dehn Potentialausgleich-Schiene Cu','1200','Dehn + Söhne','Freigegeben',100,0,'L=800mm 16 Anschl.','4.2');
+    mk('Blitzschutz-Ableiterkabel','Kaufteil','Dehn Blitzschutz-Ableiterkabel 50mm² Cu','1800','Dehn + Söhne','Freigegeben',100,0,'L=80m','8.4');
+    for(let i=1;i<=20;i++) mk(`Kabelschelle Turm Typ A ${String(i).padStart(2,'0')}`,'Kaufteil','Stauff Rohrklemme EN13918 Stahl','180','Stauff','Freigegeben',100,0,'DN80','0.42');
+    for(let i=1;i<=20;i++) mk(`Kabelschelle Turm Typ B ${String(i).padStart(2,'0')}`,'Kaufteil','Stauff Rohrklemme EN13918 Stahl','180','Stauff','Freigegeben',100,0,'DN50','0.24');
+  }
+  /* ── Schrauben & Verbinder ── */
   else if(gid==='befestigung'){
     const specs=[
-      ['M3 Schraube DIN 933 A2',1000,'Stahl A2-70','0.04','Würth','M3×10mm','0.0012'],
-      ['M4 Schraube DIN 933 A2',1500,'Stahl A2-70','0.06','Würth','M4×14mm','0.0028'],
-      ['M5 Schraube DIN 933 A2-70',1000,'Stahl A2-70','0.09','Würth','M5×18mm','0.0054'],
-      ['M6 Schraube DIN 931 A2-70',800,'Stahl A2-70','0.12','Würth','M6×22mm','0.0090'],
-      ['M8 Bolzen DIN 931 8.8',500,'Stahl 8.8 verz.','0.18','Häfele','M8×30mm','0.020'],
-      ['M10 Bolzen DIN 931 8.8',200,'Stahl 8.8 verz.','0.28','Häfele','M10×40mm','0.040'],
-      ['M4 Mutter DIN 934 A2',1500,'Stahl A2','0.03','Würth','M4','0.0018'],
-      ['M6 Mutter DIN 934 A2',600,'Stahl A2','0.05','Würth','M6','0.0040'],
-      ['M8 Mutter DIN 934 8.8',500,'Stahl 8.8','0.07','Häfele','M8','0.0075'],
-      ['M4 Unterlegscheibe DIN 125',500,'Stahl A2','0.02','Würth','Ø9×1.5mm','0.0012'],
-      ['M6 Unterlegscheibe DIN 125',200,'Stahl A2','0.03','Würth','Ø12×2mm','0.0028'],
-      ['M4 Federring DIN 127',300,'Federstahl A2','0.03','Würth','Ø4mm','0.0008'],
-      ['M6 Federring DIN 127',200,'Federstahl A2','0.04','Würth','Ø6mm','0.0018'],
-      ['Kunststoffclip PA66',300,'PA66 schwarz','0.08','Richco','10×6×10mm','0.0030'],
-      ['Blindniet Ø3.2×8 Al',212,'Aluminium EN-AW 5052','0.05','Gesipa','Ø3.2×8mm','0.0008'],
+      ['Sechskantschraube M36×150 10.9 feuervz.',200,'Stahl 10.9 feuerverzinkt','8.40','Peiner Umformtechnik','M36×150mm','0.420'],
+      ['Sechskantschraube M30×100 10.9',400,'Stahl 10.9 feuerverzinkt','4.20','Peiner','M30×100mm','0.220'],
+      ['Sechskantschraube M24×80 10.9',600,'Stahl 10.9 feuerverzinkt','2.40','Würth','M24×80mm','0.090'],
+      ['Sechskantschraube M20×70 10.9',800,'Stahl 10.9 feuerverzinkt','1.20','Würth','M20×70mm','0.055'],
+      ['Sechskantschraube M16×60 8.8',1000,'Stahl 8.8 galv.','0.48','Würth','M16×60mm','0.028'],
+      ['Sechskantschraube M12×50 8.8',1200,'Stahl 8.8 galv.','0.24','Würth','M12×50mm','0.012'],
+      ['Sechskantmutter M36 10.9 feuervz.',200,'Stahl 10.9 feuerverzinkt','4.20','Peiner','M36','0.180'],
+      ['Sechskantmutter M30 10.9',400,'Stahl 10.9','2.10','Würth','M30','0.088'],
+      ['Sechskantmutter M24 10.9',600,'Stahl 10.9','0.84','Würth','M24','0.038'],
+      ['Sechskantmutter M20 8.8',800,'Stahl 8.8 galv.','0.42','Würth','M20','0.018'],
+      ['Sechskantmutter M16 8.8',1000,'Stahl 8.8 galv.','0.18','Würth','M16','0.008'],
+      ['Unterlegscheibe DIN 125 M36',400,'Stahl feuerverzinkt','1.20','Würth','Ø72×Ø38×6mm','0.060'],
+      ['Unterlegscheibe DIN 125 M24',600,'Stahl galv.','0.48','Würth','Ø50×Ø25×4mm','0.018'],
+      ['Unterlegscheibe DIN 125 M16',800,'Stahl galv.','0.18','Würth','Ø34×Ø17×3mm','0.006'],
+      ['Stiftschraube M72×500 Fundamentanker',16,'Stahl 10.9 feuerverzinkt','48.00','Peiner','M72×500mm','28.0'],
     ];
     specs.forEach(([nm,cnt,mat,cost,sup,dims,wt])=>{for(let i=1;i<=cnt;i++) mk(`${nm} ${String(i).padStart(cnt>=1000?4:3,'0')}`,'Normteil',mat,cost,sup,'Freigegeben',100,0,dims,wt);});
   }
